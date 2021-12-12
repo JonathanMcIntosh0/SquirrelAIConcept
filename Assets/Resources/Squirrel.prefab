@@ -202,7 +202,7 @@ GameObject:
   - component: {fileID: 6126786111040603621}
   m_Layer: 6
   m_Name: Squirrel
-  m_TagString: Untagged
+  m_TagString: Squirrel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -237,7 +237,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 0}
-  homeTreeID: 0
   squirrelID: 0
   climbSpeed: 10
 --- !u!1 &666979198021073399
