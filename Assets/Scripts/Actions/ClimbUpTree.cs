@@ -21,22 +21,17 @@ namespace Actions
 
         public override bool PreCondition(WorldVector state)
         {
-            // var state = _controller.WorldState;
             if (!state.AtClimbableObject) return false; 
             //Note that if AtClimbableObject then CurGameObject != null
             _climbable ??= state.CurGameObject.GetComponent<IClimbable>();
             
-            var tree = state.CurGameObject;
-            if (tree == null || !tree.CompareTag("Tree")) return false;
-            
-            if (state.HState == WorldVector.HeightState.Floor && _climbable.IsOccupied) return false; //Tree already occupied
-            
-            return true;
+            // Check if object is occupied by a squirrel (could be this squirrel)
+            // If it is occupied then check if we are on tree
+            return !_climbable.IsOccupied || state.HState != WorldVector.HeightState.Floor;
         }
 
         public override bool PostCondition(WorldVector state)
         {
-            // var state = _controller.WorldState;
             return state.CurGameObject != null &&
                    state.CurGameObject.CompareTag("Tree") &&
                    state.HState == WorldVector.HeightState.TreeTop &&
