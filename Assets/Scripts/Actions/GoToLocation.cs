@@ -20,13 +20,15 @@ namespace Actions
 
         public override bool PreCondition(WorldVector state)
         {
-            return state.HState == WorldVector.HeightState.Floor &&
+            // TODO check if fix was correct: return state.HState == WorldVector.HeightState.Floor &&
+            return state.AtHeight(GameModel.FloorHeight) &&
                    Mathf.Approximately(state.CurPosition.y, 0f); //TODO Might remove
         }
 
         public override bool PostCondition(WorldVector state)
         {
-            return state.HState == WorldVector.HeightState.Floor &&
+            // TODO check if fix was correct: return state.HState == WorldVector.HeightState.Floor &&
+            return state.AtHeight(GameModel.FloorHeight) &&
                    Vector3.Distance(state.CurPosition, _target) <= Mathf.Epsilon;
         }
 

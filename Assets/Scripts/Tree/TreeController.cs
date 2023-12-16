@@ -52,7 +52,8 @@ namespace Tree
             do
             {
                 var r = Random.insideUnitCircle;
-                var r2 = GameModel.TreeTrunkRadius * r.normalized + (GameModel.TreeRadius - GameModel.TreeTrunkRadius) * r;
+                //We want MinNutSpawnRadius <= ||r2|| <= MaxNutSpawnRadius
+                var r2 = GameModel.MinNutSpawnRadius * r.normalized + (GameModel.MaxNutSpawnRadius - GameModel.MinNutSpawnRadius) * r;
                 newP = transform.position + new Vector3(r2.x, 0f, r2.y);
             } while (CheckNutOverlap(newP));
 

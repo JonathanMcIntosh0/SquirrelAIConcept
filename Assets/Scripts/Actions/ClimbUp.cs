@@ -5,16 +5,17 @@ using UnityEngine.AI;
 
 namespace Actions
 {
-    public class ClimbUpTree : SquirrelAction
+    public class ClimbUp : SquirrelAction
     {
         // private SquirrelController _controller;
         private Vector3 _target;
         private Transform _tf;
         private bool _isExecuting;
 
+        private GameObject _climbableGO;
         private IClimbable _climbable;
         
-        public ClimbUpTree(SquirrelController controller) : base(controller)
+        public ClimbUp(SquirrelController controller) : base(controller)
         {
             _tf = controller.transform;
         }
@@ -23,29 +24,32 @@ namespace Actions
         {
             if (!state.AtClimbableObject) return false; 
             //Note that if AtClimbableObject then CurGameObject != null
-            _climbable ??= state.CurGameObject.GetComponent<IClimbable>();
+            if (_climbableGO == null)
+            {
+                _climbableGO = state.CurGameObject;
+                _climbable = _climbableGO.GetComponent<IClimbable>();
+                _target = _tf.position;
+                _target.y = _climbable.MaxHeight;
+            }
+            //Check if still at same object
+            else if (!_climbableGO.Equals(state.CurGameObject)) return false;
             
             // Check if object is occupied by a squirrel (could be this squirrel)
             // If it is occupied then check if we are on tree
-            return !_climbable.IsOccupied || state.HState != WorldVector.HeightState.Floor;
+            return !_climbable.IsOccupied || !state.AtHeight(GameModel.FloorHeight);
         }
 
         public override bool PostCondition(WorldVector state)
         {
-            return state.CurGameObject != null &&
-                   state.CurGameObject.CompareTag("Tree") &&
-                   state.HState == WorldVector.HeightState.TreeTop &&
-                   Mathf.Approximately(state.CurPosition.y, GameModel.SquirrelHomeHeight);
+            return state.AtClimbableObject &&
+                   state.CurGameObject.Equals(_climbableGO) &&
+                   Vector3.Distance(state.CurPosition, _target) <= Mathf.Epsilon;
         }
 
         public override WorldVector Simulate(WorldVector state)
         {
-            var newState = state;
-            newState.HState = WorldVector.HeightState.TreeTop;
-            var target = state.CurPosition;
-            target.y = GameModel.SquirrelHomeHeight;
-            newState.CurPosition = target;
-            return newState;
+            state.CurPosition = _target;
+            return state;
         }
 
         public override bool Execute()
@@ -58,16 +62,13 @@ namespace Actions
                 
                 // Set Tree to occupied
                 _climbable.IsOccupied = true;
-                
-                //Set target
-                _target = _tf.position;
-                _target.y = GameModel.SquirrelHomeHeight;
             }
             
             var step = _controller.climbSpeed * Time.deltaTime;
-            _tf.position = Vector3.MoveTowards(_tf.position, _target, step);
+            var p = Vector3.MoveTowards(_tf.position, _target, step);
+            _tf.position = p;
 
-            return Vector3.Distance(_tf.position, _target) <= Mathf.Epsilon;
+            return Vector3.Distance(p, _target) <= Mathf.Epsilon;
         }
     }
 }

@@ -53,6 +53,8 @@ namespace Squirrel
             Memory.UpdateMemory();
         
             // TODO Update world state accordingly
+            
+            // if 
 
             if (Path.Count == 0 || WorldState.IsPlayerNear)
             {
@@ -68,7 +70,7 @@ namespace Squirrel
             }
 
             //Execute action
-            if (Path.Peek().Execute(this) && !Path.Dequeue().PostCondition(WorldState))
+            if (Path.Peek().Execute() && !Path.Dequeue().PostCondition(WorldState))
             {
                 //Unwanted outcome (since PostCondition returned false) so repath
                 //TODO REPATH (For current Goal)

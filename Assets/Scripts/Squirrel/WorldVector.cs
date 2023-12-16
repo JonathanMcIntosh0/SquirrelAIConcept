@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using GarbageCan;
 using Tree;
 using UnityEngine;
 
@@ -8,28 +11,37 @@ namespace Squirrel
     public struct WorldVector
     {
         private GameObject Player;
-        private GameObject Squirrel; //Squirrel the world vector is attached to
-        // public SquirrelMemory Memory;
-    
-        // Squirrel Memory
+        private GameObject Squirrel;
+
+        /* --------------------------------------- *
+         *          WORLD STATE COMPONENTS
+         * --------------------------------------- */
+        
+        // Squirrel Memory (When simulating/path planing we will not update these 
         public GameObject HomeTree;
         public GameObject NearestTree;
         public Queue<GameObject> NearestGarbageCans;
         public Queue<GameObject> NearestNuts;
     
+        // Location related
         public Vector3 CurPosition;
         public GameObject CurGameObject; //Game object we are currently at. Null if not at any game object.
-        public bool AtClimbableObject;
-    
+        
+        // Flags
+        public bool AtClimbableObject; //TODO should be helper function (just a wrapper for curGameObject)
         public bool IsPlayerNear;
+        public bool IsStuck; //Can be set when Investigating a garbage bin.
+                             //Should not replan when true since we cannot act on it until after.
+                             //TODO should be helper function (just a wrapper for curGameObject)
+        public bool IsHiding; //Set to true when action plan is to hide.
+                              //This indicates to ignore IsPlayerNear when checking preconditions of certain actions.
+                              //TODO may remove/replace with a component indicating current subgoal
 
-        public enum HeightState
-        {
-            TreeTop, GarbageCanTop, Floor, Neither
-        }
-
-        public HeightState HState;
-    
+        /* --------------------------------------- *
+         *          WORLD STATE FUNCTIONS
+         * --------------------------------------- */
+        
+        // Constructor
         public WorldVector(GameObject player, GameObject squirrel, GameObject homeTree)
         {
             Player = player;
@@ -45,78 +57,70 @@ namespace Squirrel
             AtClimbableObject = true;
 
             IsPlayerNear = false;
-        
-            HState = HeightState.Floor;
+            IsStuck = false;
+            IsHiding = false;
         }
 
+        // Called every frame to update world state
         public void UpdateState()
         {
             CurPosition = Squirrel.transform.position;
             UpdateMemory();
-            UpdateCurGameObject();
-
-            AtClimbableObject = CurGameObject != null &&
+            CurGameObject = GetCurGameObject();
+            
+            AtClimbableObject = CurGameObject != null && 
                                 (CurGameObject.CompareTag("Tree") || CurGameObject.CompareTag("Garbage Can"));
 
-            IsPlayerNear = (GetHorizDistance(Player.transform.position) <= GameModel.SquirrelViewDistance);
+            IsPlayerNear = Player.transform.GetHorizDistance(CurPosition) <= GameModel.SquirrelViewDistance;
 
-            if (Mathf.Approximately(CurPosition.y, GameModel.SquirrelHomeHeight)) HState = HeightState.TreeTop;
-            else if (Mathf.Approximately(CurPosition.y, GameModel.GarbageCanHeight)) HState = HeightState.GarbageCanTop;
-            else if (Mathf.Approximately(CurPosition.y, 0f)) HState = HeightState.Floor;
-            else HState = HeightState.Neither;
-            //Note when climbing on tree we may very briefly get HState of GarbageCanTop
+            IsStuck = CheckIfStuck();
         }
-    
-        private void UpdateCurGameObject()
+
+        //Note that OnFloor is simply a wrapper for CurPosition (i.e. not needed in world vector, but more of a helper method)
+        // public bool OnFloor => Mathf.Approximately(CurPosition.y, GameModel.FloorHeight); 
+        
+        public bool AtHeight(float y) => Mathf.Approximately(CurPosition.y, y);
+        
+        /* ---------------------------------- *
+         *      PRIVATE HELPER FUNCTIONS
+         * ---------------------------------- */
+
+        private bool CheckIfStuck()
         {
-            var tolerance = 0.1f + GameModel.SquirrelRadius;
-
-            //Check if still at curGameObject
-            if (CurGameObject != null)
-            {
-                switch (CurGameObject.tag)
-                {
-                    case "Tree":
-                        tolerance += GameModel.TreeTrunkRadius;
-                        break;
-                    case "Garbage Can":
-                        tolerance += GameModel.GarbageCanRadius;
-                        break;
-                    case "Nut":
-                        tolerance += GameModel.NutRadius;
-                        break;
-                }
-                if (GetHorizDistance(CurGameObject.transform.position) <= tolerance) return;
-            }
+            return CurGameObject != null &&
+                   CurGameObject.CompareTag("Garbage Can") &&
+                   AtHeight(GameModel.GarbageCanHeight) &&
+                   CurGameObject.GetComponent<GarbageCanController>().State == State.Trap;
+        }
         
-            //Check if at any gameObjects stored in memory
-            if (GetHorizDistance(NearestTree.transform.position) <= tolerance + GameModel.TreeTrunkRadius)
-            {
-                CurGameObject = NearestTree;
-                return;
-            }
-
-            foreach (var can in NearestGarbageCans)
-            {
-                if (GetHorizDistance(can.transform.position) <= tolerance + GameModel.GarbageCanRadius)
-                {
-                    CurGameObject = can;
-                    return;
-                }
-            }
         
-            foreach (var nut in NearestNuts)
+        private GameObject GetCurGameObject()
+        {
+            const float tolerance = 0.1f;
+            
+            GameObject nearestObj = null;
+            var nearestDist = tolerance;
+
+            //TODO could also check homeTree (should be nearest tree though if at homeTree so probably no need)
+            var listToCheck = new List<GameObject>();
+            listToCheck.Add(CurGameObject);
+            listToCheck.Add(NearestTree);
+            listToCheck.AddRange(NearestGarbageCans);
+            listToCheck.AddRange(NearestNuts);
+
+            foreach (var obj in listToCheck)
             {
-                //Not including squirrel radius here since squirrels can stand on nuts
-                if (GetHorizDistance(nut.transform.position) <= 0.1f + GameModel.NutRadius) 
+                if (obj == null) continue;
+                
+                var d = GetHorizDistanceFromSquirrel(obj);
+                if (d < nearestDist)
                 {
-                    CurGameObject = nut;
-                    return;
+                    nearestDist = d;
+                    nearestObj = obj;
                 }
             }
 
-            //If here then not near any gameObject
-            CurGameObject = null; 
+            return nearestObj;
         }
 
         //TODO update descriptions
@@ -130,8 +134,8 @@ namespace Squirrel
             //and somewhat realistic as trees are quite tall.
             foreach (var tree in GameModel.Trees)
             {
-                if (GetHorizDistance(tree.transform.position) <= GameModel.SquirrelViewDistance 
-                    && GetAngleOfSight(tree.transform.position) <= GameModel.SquirrelViewAngle)
+                if (Squirrel.transform.GetHorizDistance(tree.transform.position) <= GameModel.SquirrelViewDistance 
+                    && Squirrel.transform.GetAngleOfSight(tree.transform.position) <= GameModel.SquirrelViewAngle)
                 {
                     treesInFOV.Add(tree);
 
@@ -142,8 +146,8 @@ namespace Squirrel
             //Next we will scan for garbage cans. For this we will allow other garbage cans and trees to block sight.
             foreach (var can in GameModel.GarbageCans)
             {
-                if (GetHorizDistance(can.transform.position) <= GameModel.SquirrelViewDistance 
-                    && GetAngleOfSight(can.transform.position) <= GameModel.SquirrelViewAngle)
+                if (Squirrel.transform.GetHorizDistance(can.transform.position) <= GameModel.SquirrelViewDistance 
+                    && Squirrel.transform.GetAngleOfSight(can.transform.position) <= GameModel.SquirrelViewAngle)
                 {
                     cansInFOV.Add(can);
                 }
@@ -155,8 +159,8 @@ namespace Squirrel
             {
                 foreach (var nut in tree.GetComponent<TreeController>().nuts)
                 {
-                    if (GetHorizDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
-                        && GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
+                    if (Squirrel.transform.GetHorizDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
+                        && Squirrel.transform.GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
                     {
                         nutsInFOV.Add(nut);
 
@@ -164,12 +168,14 @@ namespace Squirrel
                 }
             }
             UpdateNuts(nutsInFOV);
+            
+            //TODO Scan nuts added by player
         }
 
         private bool UpdateNearestTree(GameObject tree)
         {
-            var d1 = GetHorizDistance(NearestTree.transform.position);
-            var d2 = GetHorizDistance(tree.transform.position);
+            var d1 = NearestTree.transform.GetHorizDistance(CurPosition);
+            var d2 = tree.transform.GetHorizDistance(CurPosition);
 
             if (d2 < d1) NearestTree = tree;
             return d2 < d1;
@@ -188,17 +194,21 @@ namespace Squirrel
             NearestNuts = new Queue<GameObject>(NearestNuts.Except(nuts).Concat(nuts));
             while (NearestNuts.Count > 5) NearestNuts.Dequeue(); //Dequeue until 5 left
         }
+        
 
-        private float GetAngleOfSight(Vector3 p)
+        private float GetHorizDistanceFromSquirrel(GameObject obj)
         {
-            return Vector3.Angle(Squirrel.transform.forward, p - CurPosition);
-        }
+            if (obj == null) return Mathf.Infinity;
+            var d = obj.transform.GetHorizDistance(CurPosition);
 
-        private float GetHorizDistance(Vector3 p)
-        {
-            var a = new Vector2(CurPosition.x, CurPosition.z);
-            var b = new Vector2(p.x, p.z);
-            return Vector2.Distance(a, b);
+            if (obj.CompareTag("Nut")) return d;
+            
+            d -= GameModel.SquirrelRadius;
+            
+            if (obj.CompareTag("Tree")) return d - GameModel.TreeTrunkRadius;
+            if (obj.CompareTag("Garbage Can")) return  d - GameModel.GarbageCanRadius;
+            
+            return Mathf.Infinity;
         }
     
     }

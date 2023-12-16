@@ -17,6 +17,8 @@ namespace Actions
         public GoToGameObject(SquirrelController controller, GameObject targetGO) : base(controller)
         {
             _targetGO = targetGO;
+            _climbable = targetGO.GetComponent<IClimbable>(); //Null if not climbable
+            
             
             //Get point on NavMesh
             NavMesh.SamplePosition(targetGO.transform.position, out var closestHit, 5f, NavMesh.AllAreas);
@@ -25,24 +27,26 @@ namespace Actions
 
         public override bool PreCondition(WorldVector state)
         {
+            if (!state.AtHeight(GameModel.FloorHeight)) return false; //Cannot path unless on the ground
             if (_targetGO == null) return false; //Object was destroyed (or is missing)
-            
-            //Check if occupied
-            if (!_checkedClimbableObject)
-            {
-                _checkedClimbableObject = true;
-                _targetGO.TryGetComponent<>(out _climbable);
-            }
-            if (_climbable != null && _climbable.IsOccupied) return false;
+            if (_climbable != null && _climbable.IsOccupied) return false; //Repath if trying to go to occupied object
 
-            return state.HState == WorldVector.HeightState.Floor &&
-                   Mathf.Approximately(state.CurPosition.y, 0f); //TODO Might remove
+            return true;
+
+
+            //Check if occupied
+            // if (!_checkedClimbableObject)
+            // {
+            //     _checkedClimbableObject = true;
+            //     _targetGO.TryGetComponent<>(out _climbable);
+            // }
+            // if (_climbable != null && _climbable.IsOccupied) return false;
         }
 
         public override bool PostCondition(WorldVector state)
         {
-            return state.HState == WorldVector.HeightState.Floor &&
-                   Vector3.Distance(state.CurPosition, _target) <= Mathf.Epsilon;
+            return Vector3.Distance(state.CurPosition, _target) <= Mathf.Epsilon &&
+                   state.CurGameObject.Equals(_targetGO);
         }
 
         public override WorldVector Simulate(WorldVector state)
