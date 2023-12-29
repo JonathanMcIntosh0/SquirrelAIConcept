@@ -55,6 +55,11 @@
      <Compile Include="Assets\Scripts\GameGenerator.cs" />
      <Compile Include="Assets\Scripts\Actions\GoToLocation.cs" />
      <Compile Include="Assets\Scripts\Actions\SquirrelAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\BaseAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\BaseGoal.cs" />
+     <Compile Include="Assets\Scripts\GOAP\PathPlanner.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Target.cs" />
+     <Compile Include="Assets\Scripts\GOAP\WorldState.cs" />
      <Compile Include="Assets\Scripts\Tree\TreeController.cs" />
      <Compile Include="Assets\Scripts\Squirrel\WorldVector.cs" />
      <Compile Include="Assets\Scripts\TransformExtension.cs" />
@@ -65,7 +70,6 @@
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\GameModel.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\GarbageCanController.cs" />
-     <Compile Include="Assets\Scripts\PathPlanner.cs" />
      <Compile Include="Assets\Scripts\IClimbable.cs" />
      <Compile Include="Assets\Scripts\Actions\ISquirrelAction.cs" />
      <Compile Include="Assets\Scripts\SquirrelMemory.cs" />
@@ -668,8 +672,6 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
