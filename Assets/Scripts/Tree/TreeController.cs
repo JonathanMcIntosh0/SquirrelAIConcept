@@ -36,7 +36,7 @@ namespace Tree
             if (nuts.Count >= 5) return false;
             var nut = Instantiate(Resources.Load("Tree Nut", typeof(GameObject))) as GameObject;
             nut.transform.position = getRandomNutPos();
-        
+
             nuts.Add(nut);
 
             //Note: we only reach here if nuts.count < 5 thus we will insta spawn a nut if we drop below max allowance (of course

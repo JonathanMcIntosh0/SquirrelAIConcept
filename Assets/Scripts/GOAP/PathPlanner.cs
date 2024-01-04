@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
+using UnityEngine.Serialization;
 
 namespace GOAP
 {
-    public enum PlanResults
+    public enum PlanResult
     {
         // Unknown, //TODO maybe use unknown to show when between actions (currently just use Running)
         Running,
@@ -33,7 +33,7 @@ namespace GOAP
                 State = state;
                 Parent = parent;
                 Target = target;
-                _totalCost = parent == null ? 0f : action.GetCost(state) + parent._totalCost;
+                _totalCost = parent == null ? 0f : action.GetCost(parent.State, target) + parent._totalCost;
                 Cost = parent == null ? 0f : goal.GetCost(state, _totalCost);
             }
             
@@ -72,15 +72,15 @@ namespace GOAP
                 }
             }
 
-            public PlanResults Tick(ref WorldState curState)
+            public PlanResult Tick()
             {
-                var result = CurAction.Tick(ref curState, CurTarget);
+                var result = CurAction.Tick(CurTarget);
                 return result switch
                 {
-                    ActionResults.Running => PlanResults.Running,
-                    ActionResults.Fail => PlanResults.Fail,
-                    ActionResults.Success => 
-                        ++_curIndex == Actions.Count ? PlanResults.Success : PlanResults.Running,
+                    ActionResult.Running => PlanResult.Running,
+                    ActionResult.Fail => PlanResult.Fail,
+                    ActionResult.Success => 
+                        ++_curIndex == Actions.Count ? PlanResult.Success : PlanResult.Running,
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }
@@ -89,31 +89,44 @@ namespace GOAP
             {
                 Actions.ForEach(action => action.Reset());
             }
+
+            public override string ToString()
+            {
+                var s = $"Goal = {Goal}, Cost = {Cost}\n";
+                for (int i = 0; i < Actions.Count; i++)
+                {
+                    s += $"{Actions[i].name} - {Targets[i]}\n";
+                }
+                return s;
+            }
         }
-        
-        private WorldState _curState = new WorldState(); // TODO Probably move to Character. Also maybe remove passing to Tick methods.
-        private List<BaseGoal> _goals;
-        private List<BaseAction> _actions;
+
+        private SController _controller;
+        private WorldState _curState; // TODO Probably move to Character. Also maybe remove passing to Tick methods.
+        [SerializeField] private List<BaseGoal> goals;
+        [SerializeField] private List<BaseAction> actions;
 
         private Plan _curPlan = null;
 
         private void Awake()
         {
-            _goals = new List<BaseGoal>(GetComponents<BaseGoal>());
-            _actions = new List<BaseAction>(GetComponents<BaseAction>());
+            goals = new List<BaseGoal>(GetComponents<BaseGoal>());
+            actions = new List<BaseAction>(GetComponents<BaseAction>());
+
+            _controller = GetComponent<SController>();
         }
         
         private void Update()
         {
-            _goals.ForEach(goal => goal.RefreshPriority());
+            _curState = _controller.curState;
+            goals.ForEach(goal => goal.RefreshPriority());
             
             // TODO don't actually need to find highest priority goal. Just see if HIGHER priority goal exists.
-            var highestPriorityGoal = _goals
+            var highestPriorityGoal = goals
                 .Where(goal => goal.PreCondition(_curState))
                 .Aggregate(_curPlan?.Goal,
                     (newGoal, nextGoal) =>
-                        newGoal == null
-                        || nextGoal.Priority > newGoal.Priority
+                        newGoal == null || nextGoal.Priority > newGoal.Priority
                             ? nextGoal
                             : newGoal);
             
@@ -122,15 +135,18 @@ namespace GOAP
                 Replan();
             
             if (_curPlan == null) return;
-            var result = _curPlan.Tick(ref _curState);
-            if (result == PlanResults.Success || result == PlanResults.Fail)
+            var result = _curPlan.Tick();
+            if (result == PlanResult.Success || result == PlanResult.Fail)
                 _curPlan = null;
         }
 
         private void Replan()
         {
+            // Debug.Log($"{gameObject.name}: Attempting to replan!");
+            _curState.distanceTravelled = 0; // Reset local curState.distanceTravelled before attempting replan
+            
             var planQuery =
-                from goal in _goals
+                from goal in goals
                 where goal.PreCondition(_curState)
                 let plan = BuildPlan(goal)
                 where plan != null
@@ -139,13 +155,16 @@ namespace GOAP
             var newPlan = planQuery.Aggregate(_curPlan, 
                 (newPlan, nextPlan) =>
                     newPlan == null
-                    || newPlan.Goal.Priority < nextPlan.Goal.priority
+                    || newPlan.Goal.Priority < nextPlan.Goal.Priority
                     || newPlan.Goal == nextPlan.Goal && newPlan.Cost > nextPlan.Cost
                         ? nextPlan
                         : newPlan);
 
             if (newPlan == _curPlan) return;
             
+            Debug.Log($"{gameObject.name}: Found new plan: \n{newPlan}");
+            
+            _controller.curState.hasReplanned = true; // Will cause curState.distanceTravelled to be reset on next update
             _curPlan = newPlan;
             _curPlan.ResetActions();
         }
@@ -156,8 +175,9 @@ namespace GOAP
 
             List<Node> openList = new List<Node>();
             ExpandNode(openList, new Node(goal, _curState), goal);
-            
-            while (openList.Count > 0)
+
+            int iterations = 0;
+            while (openList.Count > 0 && iterations++ < 25)
             {
                 var minNode = openList.Aggregate(
                     (minCostNode, nextNode) => minCostNode.Cost > nextNode.Cost ? nextNode : minCostNode);
@@ -169,16 +189,17 @@ namespace GOAP
                 ExpandNode(openList, minNode, goal);
             }
 
+            Debug.Log($"{gameObject.name}: Could not find plan - openList.Count = {openList.Count}, iter = {iterations}\n");
             return null;
         }
         
         private void ExpandNode(List<Node> openList, Node workingNode, BaseGoal goal)
         {
             openList.AddRange(
-                from action in _actions 
+                from action in actions 
                 where action.PreCondition(workingNode.State) 
-                from target in action.GetTargets() 
-                where target.Type != TargetTypes.Nut || !workingNode.HasUsedTarget(target) 
+                from target in action.GetTargets(workingNode.State) 
+                where target.type != TargetType.Nut || !workingNode.HasUsedTarget(target) 
                 let nextState = action.CalculateState(workingNode.State, target) 
                 where nextState != null 
                 select new Node(goal, nextState.Value, action, target, workingNode));

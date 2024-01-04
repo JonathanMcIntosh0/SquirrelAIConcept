@@ -282,6 +282,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 913315274395471652, guid: 04a4d5826cf7aa947bb82796e61dcbb9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2481236827259384542, guid: 04a4d5826cf7aa947bb82796e61dcbb9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04a4d5826cf7aa947bb82796e61dcbb9, type: 3}
 --- !u!1 &560941741
@@ -1235,10 +1243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab34032c4323c6e449b0a57771722628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emptyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  fullColor: {r: 0, g: 0, b: 0, a: 1}
-  isEmpty: 1
-  hasSquirrel: 0
 --- !u!1001 &4716711868034958262
 PrefabInstance:
   m_ObjectHideFlags: 0

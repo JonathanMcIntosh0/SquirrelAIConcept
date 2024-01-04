@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GOAP
 {
-    public enum ActionResults
+    public enum ActionResult
     {
         // Unknown,
         Running,
@@ -16,50 +16,55 @@ namespace GOAP
     {
         
         
-        private enum ActionStages
+        private enum ActionStage
         {
             MovingToInspect = 0,
             MovingToUse = 1,
             Using = 2
         }
-        private ActionStages _stage = 0;
+        private ActionStage _stage = 0;
+        protected SController Controller;
         
         // TODO Add Memory and Controller fields (or just an agent that has both)
 
         public abstract bool PreCondition(WorldState cur);
-        public abstract bool PostCondition(WorldState next);
+        // public abstract bool PostCondition(WorldState next);
         public abstract WorldState? CalculateState(WorldState cur, Target target); //TODO might not need nullable
-        public abstract float GetCost(WorldState cur);
-        public abstract List<Target> GetTargets(); // Returns possible targets. E.g. Nuts in sight and memory for GatherNut
+        public abstract float GetCost(WorldState cur, Target target);
+        public abstract List<Target> GetTargets(WorldState cur); // Returns possible targets from cur state. E.g. Nuts in sight and memory for GatherNut
 
-        public ActionResults Tick(ref WorldState cur, Target target)
+        public ActionResult Tick(Target target)
         {
+            WorldState curState = Controller.curState;
             var result = _stage switch
             {
-                ActionStages.MovingToInspect => Tick_MoveToInspect(ref cur, target),
-                ActionStages.MovingToUse => Tick_MoveToUse(ref cur, target),
-                ActionStages.Using => Tick_Use(ref cur, target),
+                ActionStage.MovingToInspect => Tick_MoveToInspect(ref curState, target),
+                ActionStage.MovingToUse => Tick_MoveToUse(ref curState, target),
+                ActionStage.Using => Tick_Use(ref curState, target),
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
-            if (_stage != ActionStages.Using && result == ActionResults.Success) 
-            {
-                _stage++;
-                result = ActionResults.Running;
-            }
+            Controller.curState = curState;
 
+            if (result != ActionResult.Success) return result;
+            if (_stage != ActionStage.Using)
+            {
+                result = ActionResult.Running;
+                _stage++;
+                // Debug.Log($"{gameObject.name}: Moving to stage {_stage} of {GetType().Name}");
+            }
+            else _stage = 0;
+            
             return result;
         }
-        protected abstract ActionResults Tick_MoveToInspect(ref WorldState cur, Target target);
-        protected abstract ActionResults Tick_MoveToUse(ref WorldState cur, Target target);
-        protected abstract ActionResults Tick_Use(ref WorldState cur, Target target);
+        protected abstract ActionResult Tick_MoveToInspect(ref WorldState cur, Target target);
+        protected abstract ActionResult Tick_MoveToUse(ref WorldState cur, Target target);
+        protected abstract ActionResult Tick_Use(ref WorldState cur, Target target);
 
-        public void Reset() { _stage = ActionStages.MovingToInspect; }
+        public void Reset() { _stage = ActionStage.MovingToInspect; }
 
         private void Awake()
         {
-            throw new NotImplementedException();
+            Controller = GetComponent<SController>();
         }
-        // public void Awake() { // Get components }
     }
 }

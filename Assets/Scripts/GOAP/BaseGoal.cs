@@ -6,14 +6,14 @@ namespace GOAP
     public abstract class BaseGoal : MonoBehaviour
     {
         //TODO Add enum of preset priority levels
-        [SerializeField] public int priority = 0;
+        [SerializeField] private int priority = 0;
         public int Priority
         {
             get => priority;
             protected set => priority = value;
         }
-        
-        //TODO Add Agent field to allow goals to access memory and such
+
+        protected SController Controller;
         
         public abstract bool PreCondition(WorldState cur);
         public abstract bool PostCondition(WorldState next);
@@ -22,7 +22,12 @@ namespace GOAP
 
         protected void Start()
         {
-            throw new NotImplementedException(); //TODO init Agent field
+            Controller = GetComponent<SController>();
+        }
+
+        public override string ToString()
+        {
+            return GetType().Name;
         }
     }
 }

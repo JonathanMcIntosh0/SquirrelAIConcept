@@ -200,6 +200,11 @@ GameObject:
   m_Component:
   - component: {fileID: 666979196680993687}
   - component: {fileID: 6126786111040603621}
+  - component: {fileID: 6701372830831536982}
+  - component: {fileID: 913315274395471652}
+  - component: {fileID: 5655485704008505386}
+  - component: {fileID: 1424223455059897706}
+  - component: {fileID: 4526167552080997791}
   m_Layer: 6
   m_Name: Squirrel
   m_TagString: Squirrel
@@ -221,6 +226,7 @@ Transform:
   - {fileID: 666979198021073396}
   - {fileID: 666979196621970719}
   - {fileID: 666979196176708633}
+  - {fileID: 111350256474579670}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -231,7 +237,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 666979196680993686}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c019bd6c404add746b02e3e13292ca98, type: 3}
   m_Name: 
@@ -239,6 +245,104 @@ MonoBehaviour:
   agent: {fileID: 0}
   squirrelID: 0
   climbSpeed: 10
+--- !u!114 &6701372830831536982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c41fc30619948feac315cba2f42a52b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goals: []
+  actions: []
+--- !u!114 &913315274395471652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f4a6a30164448b6a24df4db6e983737, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planner: {fileID: 6701372830831536982}
+  agent: {fileID: 0}
+  homeTree: {fileID: 0}
+  climbSpeed: 5
+  nutMemorySize: 5
+  garbageCanMemorySize: 2
+  treeMemorySize: 1
+  nutInventorySize: 3
+  garbageInventorySize: 1
+  curState:
+    location: {x: 0, y: 0}
+    height: 0
+    isPlayerNear: 0
+    nutsCarried: 0
+    garbageCarried: 0
+    isInventoryFull: 0
+    hasStored: 0
+    hasReplanned: 0
+    distanceTravelled: 0
+  offMeshDestination: {x: 0, y: 0}
+  destination: {x: 0, y: 0, z: 0}
+  reachedDestination: 0
+  destinationSet: 0
+  homeTreeTarget:
+    location: {x: 0, y: 0}
+    type: 0
+    obj: {fileID: 0}
+    state: 0
+  targetsInFOV: []
+  targetsInMemory: []
+--- !u!114 &5655485704008505386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2716694617d43f792c05afa558e0ea4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  priority: 0
+  minTravelDistance: 10
+--- !u!114 &1424223455059897706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d56bdb6cf23549c183e5290b4f84c685, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  priority: 10
+  minExploreDistance: 15
+--- !u!114 &4526167552080997791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26bc661023974451905cca97a9555a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfTargets: 10
+  randomRange: 3
 --- !u!1 &666979198021073399
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,3 +439,86 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1912430078557322795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 111350256474579670}
+  - component: {fileID: 3069939732861710773}
+  - component: {fileID: 2738477198525761220}
+  m_Layer: 6
+  m_Name: Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &111350256474579670
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912430078557322795}
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: 0, y: 5, z: -5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 666979196680993687}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+--- !u!20 &3069939732861710773
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912430078557322795}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!81 &2738477198525761220
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912430078557322795}
+  m_Enabled: 0

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GOAP;
 using Squirrel;
 using UnityEditor.AI;
 using UnityEngine;
@@ -66,10 +67,13 @@ public class GameGenerator : MonoBehaviour
              // var offset = offsetR + offestY;
 
              var squirrel = Instantiate(Resources.Load("Squirrel", typeof(GameObject))) as GameObject;
-             var sController = squirrel.GetComponent<SquirrelController>();
-             sController.squirrelID = i;
-             sController.Memory = new SquirrelMemory(squirrel, GameModel.Trees[i]);
-             // squirrel.transform.position = GameModel.Trees[i].transform.position;
+             squirrel.name = $"Squirrel({i})";
+             // var sController = squirrel.GetComponent<SquirrelController>();
+             var sController = squirrel.GetComponent<SController>();
+             sController.homeTree = GameModel.Trees[i];
+             // squirrel.SetActive(true);
+             // sController.squirrelID = i;
+             // sController.Memory = new SquirrelMemory(squirrel, GameModel.Trees[i]);
              GameModel.Squirrels[i] = squirrel;
              
              // GameModel.Squirrels[i].transform.rotation = Quaternion.LookRotation(offsetR);

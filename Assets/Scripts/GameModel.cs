@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+//TODO PROBABLY REMOVE MONOBEHAVIOUR
 public class GameModel : MonoBehaviour
 {
 
@@ -21,12 +22,18 @@ public class GameModel : MonoBehaviour
 
     public const float SquirrelHomeHeight = 5f;
     public const float GarbageCanHeight = 1f;
-    public const float FloorHeight = 0f;
+    public const float FloorHeight = 0.05f;
 
     public static GameObject[] GarbageCans = new GameObject[5];
     public static GameObject[] Trees = new GameObject[10];
     public static GameObject[] Squirrels = new GameObject[5];
+    public static LinkedList<GameObject> Nuts = new LinkedList<GameObject>();
+    // TODO REDO NUT SPAWNING
+    // TODO Create NutController which has field for LLNode (used in onDestroy method).
+    // TODO Also hold either index of respective tree or ref to TreeController to decrement nut count.
+
     
+    //TODO maybe move these to within squirrel controller
     public static float SquirrelViewAngle = 45f;
     public static float SquirrelViewDistance = 10f;
 
