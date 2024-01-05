@@ -199,9 +199,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 666979196680993687}
-  - component: {fileID: 6126786111040603621}
   - component: {fileID: 6701372830831536982}
   - component: {fileID: 913315274395471652}
+  - component: {fileID: 6702707190956479133}
+  - component: {fileID: 1214897964556208805}
   - component: {fileID: 5655485704008505386}
   - component: {fileID: 1424223455059897706}
   - component: {fileID: 4526167552080997791}
@@ -230,21 +231,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6126786111040603621
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 666979196680993686}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c019bd6c404add746b02e3e13292ca98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 0}
-  squirrelID: 0
-  climbSpeed: 10
 --- !u!114 &6701372830831536982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,28 +258,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planner: {fileID: 6701372830831536982}
-  agent: {fileID: 0}
+  navSystem: {fileID: 6702707190956479133}
+  tarSystem: {fileID: 1214897964556208805}
+  playerController: {fileID: 0}
   homeTree: {fileID: 0}
-  climbSpeed: 5
-  nutMemorySize: 5
-  garbageCanMemorySize: 2
-  treeMemorySize: 1
   nutInventorySize: 3
   garbageInventorySize: 1
   curState:
     location: {x: 0, y: 0}
     height: 0
-    isPlayerNear: 0
     nutsCarried: 0
     garbageCarried: 0
+    isPlayerNear: 0
     isInventoryFull: 0
     hasStored: 0
     hasReplanned: 0
     distanceTravelled: 0
+--- !u!114 &6702707190956479133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a058a80f2b584657b2359292a4a29a39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 0}
+  climbSpeed: 5
   offMeshDestination: {x: 0, y: 0}
   destination: {x: 0, y: 0, z: 0}
   reachedDestination: 0
   destinationSet: 0
+--- !u!114 &1214897964556208805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666979196680993686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18b004c8d57b4b6cb149f6305ebd34b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nutMemorySize: 5
+  garbageCanMemorySize: 2
+  treeMemorySize: 1
   homeTreeTarget:
     location: {x: 0, y: 0}
     type: 0

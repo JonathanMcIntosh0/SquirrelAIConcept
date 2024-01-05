@@ -43,15 +43,19 @@ public class GameGenerator : MonoBehaviour
             if (i < 5)
             {
                 //Spawn Garbage Can
-                GameModel.GarbageCans[i] = Instantiate(Resources.Load("Garbage", typeof(GameObject))) as GameObject;
-                GameModel.GarbageCans[i].transform.position = points[i];
+                GameModel.GarbageCans[i] = Instantiate(
+                    Resources.Load<GameObject>("Garbage"), 
+                    points[i], Quaternion.identity);
+                // GameModel.GarbageCans[i].transform.position = points[i];
                 // GameModel.GarbageCans[i].SetActive(false);
             }
             else
             {
                 //Spawn Tree
-                GameModel.Trees[i - 5] = Instantiate(Resources.Load("Tree", typeof(GameObject))) as GameObject;
-                GameModel.Trees[i - 5].transform.position = points[i];
+                GameModel.Trees[i - 5] = Instantiate(
+                    Resources.Load<GameObject>("Tree"), 
+                    points[i], Quaternion.identity);
+                // GameModel.Trees[i - 5].transform.position = points[i];
                 // GameModel.Trees[i - 5].SetActive(false);
             }
         }
@@ -66,9 +70,10 @@ public class GameGenerator : MonoBehaviour
              // var offestY = new Vector3(0f, GameModel.MaxSquirrelHeight, 0f);
              // var offset = offsetR + offestY;
 
-             var squirrel = Instantiate(Resources.Load("Squirrel", typeof(GameObject))) as GameObject;
+             var squirrel = Instantiate(
+                 Resources.Load<GameObject>("Squirrel"),
+                 GameModel.Trees[i].transform.position, Quaternion.identity);
              squirrel.name = $"Squirrel({i})";
-             // var sController = squirrel.GetComponent<SquirrelController>();
              var sController = squirrel.GetComponent<SController>();
              sController.homeTree = GameModel.Trees[i];
              // squirrel.SetActive(true);

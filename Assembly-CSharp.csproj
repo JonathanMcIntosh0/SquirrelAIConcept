@@ -80,6 +80,8 @@
      <Compile Include="Assets\Scripts\Actions\ClimbDown.cs" />
      <Compile Include="Assets\Scripts\GOAP\SController.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\State.cs" />
+     <Compile Include="Assets\Scripts\GOAP\TargetingSystem.cs" />
+     <Compile Include="Assets\Scripts\GOAP\NavigationSystem.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.20f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>

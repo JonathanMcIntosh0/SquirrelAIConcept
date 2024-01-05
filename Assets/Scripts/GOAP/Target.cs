@@ -16,7 +16,7 @@ namespace GOAP
     {
         InFOV,
         InMemory,
-        Forgotten
+        Forgotten // Not within targets in memory or FOV (Targeting system does not store nor update)
     }
     
     [Serializable]

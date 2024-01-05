@@ -102,11 +102,14 @@ namespace GOAP
         }
 
         private SController _controller;
-        private WorldState _curState; // TODO Probably move to Character. Also maybe remove passing to Tick methods.
+        private WorldState _curState;
         [SerializeField] private List<BaseGoal> goals;
         [SerializeField] private List<BaseAction> actions;
 
+        [SerializeField] private int maxIterations = 50; 
+        
         private Plan _curPlan = null;
+        public bool HasPlan => _curPlan != null;
 
         private void Awake()
         {
@@ -143,8 +146,9 @@ namespace GOAP
         private void Replan()
         {
             // Debug.Log($"{gameObject.name}: Attempting to replan!");
-            _curState.distanceTravelled = 0; // Reset local curState.distanceTravelled before attempting replan
-            
+            // _curState.distanceTravelled = 0; // Reset local curState.distanceTravelled before attempting replan
+            _curState.ResetForPlanning();
+
             var planQuery =
                 from goal in goals
                 where goal.PreCondition(_curState)
@@ -164,7 +168,8 @@ namespace GOAP
             
             Debug.Log($"{gameObject.name}: Found new plan: \n{newPlan}");
             
-            _controller.curState.hasReplanned = true; // Will cause curState.distanceTravelled to be reset on next update
+            _controller.curState.ResetForPlanning();
+            // _controller.curState.hasReplanned = true; // Will cause curState.distanceTravelled to be reset on next update
             _curPlan = newPlan;
             _curPlan.ResetActions();
         }
@@ -177,7 +182,7 @@ namespace GOAP
             ExpandNode(openList, new Node(goal, _curState), goal);
 
             int iterations = 0;
-            while (openList.Count > 0 && iterations++ < 25)
+            while (openList.Count > 0 && iterations++ < maxIterations)
             {
                 var minNode = openList.Aggregate(
                     (minCostNode, nextNode) => minCostNode.Cost > nextNode.Cost ? nextNode : minCostNode);

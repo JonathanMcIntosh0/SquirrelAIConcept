@@ -30,7 +30,7 @@ namespace GOAP
             var targets = new List<Target>();
             for (int i = 0; i < numberOfTargets; i++)
             {
-                targets.Add(Controller.GetRandomLocationTarget(randomRange, cur.location));
+                targets.Add(Controller.tarSystem.GetRandomLocationTarget(randomRange, cur.location));
             }
 
             return targets;
@@ -43,8 +43,8 @@ namespace GOAP
 
         protected override ActionResult Tick_MoveToUse(ref WorldState cur, Target target)
         {  
-            Controller.SetDestination(target.location, GameModel.FloorHeight);
-            return Controller.reachedDestination ? ActionResult.Success : ActionResult.Running;
+            Controller.navSystem.SetDestination(target.location, GameModel.FloorHeight);
+            return Controller.navSystem.reachedDestination ? ActionResult.Success : ActionResult.Running;
         }
 
         protected override ActionResult Tick_Use(ref WorldState cur, Target target)

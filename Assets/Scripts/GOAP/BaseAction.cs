@@ -14,8 +14,6 @@ namespace GOAP
     
     public abstract class BaseAction : MonoBehaviour
     {
-        
-        
         private enum ActionStage
         {
             MovingToInspect = 0,
@@ -25,8 +23,16 @@ namespace GOAP
         private ActionStage _stage = 0;
         protected SController Controller;
         
-        // TODO Add Memory and Controller fields (or just an agent that has both)
+        // private delegate ActionResult TickFunc(ref WorldState cur, Target target);
+        // private TickFunc[] TickFuncs;
 
+        // TODO maybe make baseAction class just have tick (no stages) then create subclass for useActions
+        // TODO also make planner call reset if tick != ActionResult.Running instead of resetting within tick
+        
+        // TODO or could have list/array of delegate functions
+        
+        // TODO maybe create startMove stage so we don't keep calling setDestination repeatedly.
+        
         public abstract bool PreCondition(WorldState cur);
         // public abstract bool PostCondition(WorldState next);
         public abstract WorldState? CalculateState(WorldState cur, Target target); //TODO might not need nullable
