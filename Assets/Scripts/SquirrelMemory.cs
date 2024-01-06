@@ -78,16 +78,16 @@ public class SquirrelMemory
         //We will scan nuts based on trees in FOV
         foreach (var tree in treesInFOV)
         {
-            foreach (var nut in tree.GetComponent<TreeController>().nuts)
-            {
-                if (GetDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
-                    && GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
-                {
-                    nutsInFOV.Add(nut);
-
-                    UpdateNuts(nutsInFOV);
-                }
-            }
+            // foreach (var nut in tree.GetComponent<TreeController>().nuts)
+            // {
+            //     if (GetDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
+            //         && GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
+            //     {
+            //         nutsInFOV.Add(nut);
+            //
+            //         UpdateNuts(nutsInFOV);
+            //     }
+            // }
         }
     }
 

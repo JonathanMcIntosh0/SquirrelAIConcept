@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace GOAP
+namespace GOAP.Goals
 {
     public class ExploreGoal : BaseGoal
     {

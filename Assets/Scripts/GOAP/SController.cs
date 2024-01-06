@@ -18,10 +18,10 @@ namespace GOAP
     {
         [Header("Components")]
         // TODO check what components can be removed. Might just do GetComponent within BaseAction and Goal.
-        // TODO Probably can make this class "StateModifier" and remove notion of "main controller"
-        public PathPlanner planner;
-        public NavigationSystem navSystem;
-        public TargetingSystem tarSystem;
+        // TODO Probably can make this class a "StateModifier" and remove notion of "main controller"
+        // public PathPlanner planner;
+        // public NavigationSystem navSystem;
+        // public TargetingSystem tarSystem;
         public PlayerController playerController;
         
         // TODO probably move homeTree to targetingSystem
@@ -38,9 +38,9 @@ namespace GOAP
 
         private void Awake()
         {
-            planner = GetComponent<PathPlanner>();
-            navSystem = GetComponent<NavigationSystem>();
-            tarSystem = GetComponent<TargetingSystem>();
+            // planner = GetComponent<PathPlanner>();
+            // navSystem = GetComponent<NavigationSystem>();
+            // tarSystem = GetComponent<TargetingSystem>();
             playerController = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
         }
 

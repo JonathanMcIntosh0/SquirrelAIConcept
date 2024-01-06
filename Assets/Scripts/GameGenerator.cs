@@ -25,7 +25,8 @@ public class GameGenerator : MonoBehaviour
      * within our game area.
      */
 
-    public const float MinDistance = 2.5f; //Min value for coordinate wise distance between 2 randomly generated points (or wall)
+    //Min value for coordinate wise distance between 2 randomly generated points (or wall)
+    private readonly float _minDistance = Mathf.Max(GameModel.TreeRadius, GameModel.GarbageCanRadius); 
     
     
     // Start is called before the first frame update
@@ -86,15 +87,16 @@ public class GameGenerator : MonoBehaviour
         
     }
 
-    // To generate our random points we will generate two lists of sparse floats between 0 and GameModel.Max_X (and Max_Z),
-    // such that the distance between any 2 points is at least MinDistance. We will then randomise the order of the
+    // To generate our random points we will generate two lists of sparse floats between GameModel.Min_X and
+    // GameModel.Max_X (and for Z), such that the distance between any 2 points is at least MinDistance.
+    // We will then randomise the order of the
     // lists and pair the entries of both lists to get our points.
     private Vector3[] getRandomPoints()
     {
         Vector3[] points = new Vector3[15];
 
-        var xList = GenRandomList(GameModel.Max_X);
-        var zList = GenRandomList(GameModel.Max_Z);
+        var xList = GenRandomList(GameModel.MinX, GameModel.MaxX);
+        var zList = GenRandomList(GameModel.MinZ, GameModel.MaxZ);
         
         // Shuffle both lists as they are currently sorted.
         // Note that shuffling one list suffices as we would still get a list of random points in the end,
@@ -118,41 +120,41 @@ public class GameGenerator : MonoBehaviour
         return points;
     }
 
-    // Generate a random list of 15 sparsely separated floats between 0 and max
-    private float[] GenRandomList(float max)
+    // Generate a random list of 15 sparsely separated floats between min and max
+    private float[] GenRandomList(float min, float max)
     {
         // Sorted lists of already chosen values
         LinkedList<float> xs = new LinkedList<float>();
 
         // Add boundary coordinate components
-        xs.AddFirst(0f);
+        xs.AddFirst(min);
         xs.AddLast(max);
 
         //DTotal is the total "valid" distance for which we can choose a new point from. We will update this as we add new points.
-        var dTotal = xs.Last.Value - xs.First.Value - 2 * MinDistance;
+        var dTotal = xs.Last.Value - xs.First.Value - 2 * _minDistance;
 
         // Generate points one by one
         for (int i = 0; i < 15; i++)
         {
-            //First we will choose which 2 points we want to generate our new point between 
+            //First we will choose which 2 points in xs we want to generate our new point between 
             var r = Random.Range(0f, dTotal);
             var cur = xs.First;
             // Here we let s be the sum of "valid" distances between points in xs until cur.Next 
-            var s = Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * MinDistance);
+            var s = Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * _minDistance);
             // Iterate until r <= s. If r <= s then we choose our next point between cur and cur.Next
             while (r > s)
             {
                 // Update cur and s
                 cur = cur.Next;
-                s += Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * MinDistance);
+                s += Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * _minDistance);
             }
             
             //Now we will choose a new point between cur and cur.Next, then update dTotal accordingly
-            var x1 = cur.Value + MinDistance;
-            var x2 = cur.Next.Value - MinDistance;
+            var x1 = cur.Value + _minDistance;
+            var x2 = cur.Next.Value - _minDistance;
             var x = getAdjustedRandom(x1, x2);
 
-            dTotal -= Mathf.Min(MinDistance, x - x1) + Mathf.Min(MinDistance, x2 - x);
+            dTotal -= Mathf.Min(_minDistance, x - x1) + Mathf.Min(_minDistance, x2 - x);
             xs.AddAfter(cur, x);
         }
         

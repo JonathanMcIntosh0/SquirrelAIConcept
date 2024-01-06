@@ -7,8 +7,13 @@ using UnityEngine.AI;
 public class GameModel : MonoBehaviour
 {
 
-    public const float Max_X = 75f;
-    public const float Max_Z = 75f;
+    // TODO maybe get these values on awake from prefabs and scene or something.
+    // This would avoid issues if we change proportions within editor
+
+    public const float MinX = 0f;
+    public const float MinZ = 0f;
+    public const float MaxX = 75f;
+    public const float MaxZ = 75f;
     
     public const float SquirrelRadius = 0.15f;
     public const float TreeTrunkRadius = 0.5f;
@@ -41,7 +46,7 @@ public class GameModel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

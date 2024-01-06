@@ -245,6 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goals: []
   actions: []
+  maxIterations: 50
 --- !u!114 &913315274395471652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,9 +258,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4a6a30164448b6a24df4db6e983737, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planner: {fileID: 6701372830831536982}
-  navSystem: {fileID: 6702707190956479133}
-  tarSystem: {fileID: 1214897964556208805}
   playerController: {fileID: 0}
   homeTree: {fileID: 0}
   nutInventorySize: 3
@@ -272,7 +270,6 @@ MonoBehaviour:
     isPlayerNear: 0
     isInventoryFull: 0
     hasStored: 0
-    hasReplanned: 0
     distanceTravelled: 0
 --- !u!114 &6702707190956479133
 MonoBehaviour:

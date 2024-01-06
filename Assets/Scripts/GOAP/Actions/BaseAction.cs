@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GOAP
+namespace GOAP.Actions
 {
     public enum ActionResult
     {
@@ -22,6 +22,8 @@ namespace GOAP
         }
         private ActionStage _stage = 0;
         protected SController Controller;
+        protected NavigationSystem NavSystem;
+        protected TargetingSystem TarSystem;
         
         // private delegate ActionResult TickFunc(ref WorldState cur, Target target);
         // private TickFunc[] TickFuncs;
@@ -62,6 +64,22 @@ namespace GOAP
             
             return result;
         }
+
+        //TODO maybe combine MoveToInspect and MoveToUse into the function below
+        //TODO also maybe move TargetState checks to outside IsUsable to allow reuse of function in Use
+        //TODO as mentioned above maybe generalise this to a UseAction class
+        // protected virtual ActionResult Tick_Move(ref WorldState cur, Target target)
+        // {
+        //     switch (target.state)
+        //     {
+        //         case TargetState.Forgotten:
+        //         case TargetState.InFOV when !target.IsUsable():
+        //             return ActionResult.Fail;
+        //         default: // InMemory or InFOV && Usable
+        //             NavSystem.SetDestination(target.location, GameModel.FloorHeight);
+        //             return NavSystem.reachedDestination ? ActionResult.Success : ActionResult.Running;
+        //     }
+        // }
         protected abstract ActionResult Tick_MoveToInspect(ref WorldState cur, Target target);
         protected abstract ActionResult Tick_MoveToUse(ref WorldState cur, Target target);
         protected abstract ActionResult Tick_Use(ref WorldState cur, Target target);
@@ -71,6 +89,8 @@ namespace GOAP
         private void Awake()
         {
             Controller = GetComponent<SController>();
+            NavSystem = GetComponent<NavigationSystem>();
+            TarSystem = GetComponent<TargetingSystem>();
         }
     }
 }

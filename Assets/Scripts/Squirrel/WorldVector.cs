@@ -157,15 +157,15 @@ namespace Squirrel
             //We will scan nuts based on trees in FOV
             foreach (var tree in treesInFOV)
             {
-                foreach (var nut in tree.GetComponent<TreeController>().nuts)
-                {
-                    if (Squirrel.transform.GetHorizDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
-                        && Squirrel.transform.GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
-                    {
-                        nutsInFOV.Add(nut);
-
-                    }
-                }
+                // foreach (var nut in tree.GetComponent<TreeController>().nuts)
+                // {
+                //     if (Squirrel.transform.GetHorizDistance(nut.transform.position) <= GameModel.SquirrelViewDistance 
+                //         && Squirrel.transform.GetAngleOfSight(nut.transform.position) <= GameModel.SquirrelViewAngle)
+                //     {
+                //         nutsInFOV.Add(nut);
+                //
+                //     }
+                // }
             }
             UpdateNuts(nutsInFOV);
             

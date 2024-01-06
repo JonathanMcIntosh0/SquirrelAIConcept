@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GOAP.Actions;
+using GOAP.Goals;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,6 +16,9 @@ namespace GOAP
         Fail
     }
     
+    [RequireComponent(typeof(SController), 
+        typeof(NavigationSystem), 
+        typeof(TargetingSystem))]
     public class PathPlanner : MonoBehaviour
     {
         private class Node

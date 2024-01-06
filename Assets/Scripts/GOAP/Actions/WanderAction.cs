@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace GOAP
+namespace GOAP.Actions
 {
     public class WanderAction : BaseAction
     {
@@ -30,7 +29,7 @@ namespace GOAP
             var targets = new List<Target>();
             for (int i = 0; i < numberOfTargets; i++)
             {
-                targets.Add(Controller.tarSystem.GetRandomLocationTarget(randomRange, cur.location));
+                targets.Add(TarSystem.GetRandomLocationTarget(randomRange, cur.location));
             }
 
             return targets;
@@ -43,8 +42,8 @@ namespace GOAP
 
         protected override ActionResult Tick_MoveToUse(ref WorldState cur, Target target)
         {  
-            Controller.navSystem.SetDestination(target.location, GameModel.FloorHeight);
-            return Controller.navSystem.reachedDestination ? ActionResult.Success : ActionResult.Running;
+            NavSystem.SetDestination(target.location, GameModel.FloorHeight);
+            return NavSystem.reachedDestination ? ActionResult.Success : ActionResult.Running;
         }
 
         protected override ActionResult Tick_Use(ref WorldState cur, Target target)

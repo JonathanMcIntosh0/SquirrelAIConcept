@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GOAP
+namespace GOAP.Goals
 {
     public abstract class BaseGoal : MonoBehaviour
     {
