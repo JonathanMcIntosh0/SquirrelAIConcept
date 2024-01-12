@@ -13,7 +13,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{f20ab581-0980-4576-e34c-1cb54dc59c3d}</ProjectGuid>
+    <ProjectGuid>{7b960864-e6da-f84d-ba9a-ea6b4a9749b0}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -55,12 +55,6 @@
      <Compile Include="Assets\Scripts\GameGenerator.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\WanderAction.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\GatherGarbageAction.cs" />
-     <Compile Include="Assets\Scripts\GOAP\Agent\NavigationSystem.cs" />
-     <Compile Include="Assets\Scripts\GOAP\Agent\PathPlanner.cs" />
-     <Compile Include="Assets\Scripts\GOAP\Agent\SController.cs" />
-     <Compile Include="Assets\Scripts\GOAP\Agent\TargetingSystem.cs" />
-     <Compile Include="Assets\Scripts\Nut\NutController.cs" />
-     <Compile Include="Assets\Scripts\Nut\NutSpawner.cs" />
      <Compile Include="Assets\Scripts\Tree\TreeController.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\FleeGoal.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\BaseAction.cs" />
@@ -71,15 +65,21 @@
      <Compile Include="Assets\Scripts\GameModel.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\GarbageCanController.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\WanderGoal.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\NavigationSystem.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\PathPlanner.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\ExploreGoal.cs" />
      <Compile Include="Assets\Scripts\IClimbable.cs" />
      <Compile Include="Assets\Scripts\GOAP\Target.cs" />
+     <Compile Include="Assets\Scripts\Nut\NutController.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\StockFoodGoal.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\BaseGoal.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\RunAwayAction.cs" />
+     <Compile Include="Assets\Scripts\Nut\NutSpawner.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\HideAction.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\StoreInventoryAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\SController.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\State.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\TargetingSystem.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.20f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
@@ -648,38 +648,37 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.20f1/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VisualStudio.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.PlasticSCM.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Users/jonat/UnityProjects/Comp521_A4/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>C:/Users/jonat/UnityProjects/SquirrelAIConcept/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Scripts\Squirrel" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
