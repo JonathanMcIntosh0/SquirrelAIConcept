@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GOAP
+namespace GOAP.Agent
 {
     [RequireComponent(typeof(PathPlanner))]
     public class NavigationSystem : MonoBehaviour
@@ -15,8 +15,9 @@ namespace GOAP
         [Header("Navigation")]
         [SerializeField] private Vector2 offMeshDestination;
         [SerializeField] private Vector3 destination;
+        [SerializeField] private IClimbable _curObj = null;
         private Vector3? _curTarget = null;
-        public bool reachedDestination = false;
+        public bool ReachedDestination => transform.position == destination;
         public bool destinationSet = false;
 
         private void Awake()
@@ -40,14 +41,13 @@ namespace GOAP
         private void Update()
         {
             if (!destinationSet) return;
-            var position = transform.position;
-            reachedDestination = position == destination;
-            if (reachedDestination)
+            if (ReachedDestination)
             {
-                destinationSet = false;
+                StopMoving();
                 return;
             }
-
+            var position = transform.position;
+            
             if (_curTarget == null)
             {
                 if (destination.GetHorizVector2() == position.GetHorizVector2())
@@ -80,31 +80,83 @@ namespace GOAP
             {
                 // Move vertically towards curTarget 
                 var step = climbSpeed * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, _curTarget.Value, step);
+                transform.position = Vector3.MoveTowards(position, _curTarget.Value, step);
             }
-            
-            if (_curTarget.Value == transform.position) 
+
+            if (_curObj != null && Math.Abs(transform.position.y - GameModel.FloorHeight) < 0.000001f)
+            {
+                ((IClimbable) _curObj).IsOccupied = false;
+                _curObj = null;
+            }
+
+            if (_curTarget.Value == transform.position)
                 _curTarget = null;
         }
 
         private void LateUpdate()
         {
-            if (!_planner.HasPlan) destinationSet = false; // Stop moving
+            if (!_planner.HasPlan) StopMoving(); // Stop moving
         }
-        
-        public void SetDestination(Vector2 loc, float height)
-        {
-            if (Math.Abs(height - destination.y) < 0.000001f && loc == offMeshDestination)
-                return;
 
+        private void StopMoving()
+        {
+            destinationSet = false;
+            _curTarget = null;
+            agent.isStopped = true;
+        }
+
+        public void SetHorizDestination(Vector2 loc)
+        {
+            if (destinationSet && loc == offMeshDestination) return; // Destination already set
             offMeshDestination = loc;
             
-            var sourcePos = new Vector3(loc.x, GameModel.FloorHeight, loc.y);
-            NavMesh.SamplePosition(sourcePos, out var closestHit, 5f, NavMesh.AllAreas);
+            // Check if currently on climbable obj
+            if (_curObj != null && _curObj.transform.position.GetHorizVector2() == loc)
+                destination = transform.position;
+            else
+            {
+                var sourcePos = new Vector3(loc.x, GameModel.FloorHeight, loc.y);
+                NavMesh.SamplePosition(sourcePos, out var closestHit, 5f, NavMesh.AllAreas);
 
-            destination = closestHit.position;
-            destination.y = height;
+                destination = closestHit.position;
+                destination.y = GameModel.FloorHeight;
+            }
+
+            _curTarget = null;
             destinationSet = true;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>false if cannot climb, otherwise true</returns>
+        public bool ClimbUp(IClimbable obj)
+        {
+            if (!CanClimb(obj)) return false;
+            // if (curObj == obj)
+            // {
+            //     destination = transform.position;
+            //     destination.y = climbable.MaxHeight;
+            //     return true;
+            // }
+            
+            // Note: We don't check horizontal position. We just assume we are at the obj we want to climb.
+            // This means the agent will climb even if pushed away from obj after reaching it.
+            
+            obj.IsOccupied = true;
+            _curObj = obj;
+            
+            destination = transform.position;
+            destination.y = obj.MaxHeight;
+            _curTarget = null;
+            destinationSet = true;
+            return true;
+        }
+
+        public bool CanClimb(IClimbable obj)
+        {
+            return _curObj == obj || !obj.IsOccupied;
         }
     }
 }

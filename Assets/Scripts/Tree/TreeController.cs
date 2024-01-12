@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GOAP;
+using Nut;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -17,6 +18,7 @@ namespace Tree
         [SerializeField] private NutSpawner nutSpawner;
         [SerializeField] private int maxNutCount = 5;
         [SerializeField] private float timeSinceLastSpawn = 0f;
+        [SerializeField] private float spawnDelay = 5f;
     
         // Start is called before the first frame update
         private void Start()
@@ -29,7 +31,7 @@ namespace Tree
         private void Update()
         {
             if (nutSpawner.nutCount < maxNutCount) timeSinceLastSpawn += Time.deltaTime;
-            if (timeSinceLastSpawn >= 2f && nutSpawner.SpawnNut(GETRandomNutPos())) 
+            if (timeSinceLastSpawn >= spawnDelay && nutSpawner.SpawnNut(GETRandomNutPos())) 
                 timeSinceLastSpawn = 0f; // At least 2 sec have passed and successfully spawned nut
         }
 

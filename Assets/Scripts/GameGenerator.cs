@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GarbageCan;
 using GOAP;
-using Squirrel;
+using GOAP.Agent;
+using Tree;
 using UnityEditor.AI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -37,25 +39,25 @@ public class GameGenerator : MonoBehaviour
         // Get 15 random points within our game area and randomly choose 5 of them to be garbage bins and the rest trees.
         // To choose our garbage cans we will simply take the first 5 entries since our getRandomPoints method randomises
         // the returned list as well.
-        var points = getRandomPoints();
+        var points = GETRandomPoints(GameModel.NumGarbageCans + GameModel.NumTrees);
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < GameModel.NumGarbageCans + GameModel.NumTrees; i++)
         {
-            if (i < 5)
+            if (i < GameModel.NumGarbageCans)
             {
                 //Spawn Garbage Can
                 GameModel.GarbageCans[i] = Instantiate(
                     Resources.Load<GameObject>("Garbage"), 
-                    points[i], Quaternion.identity);
+                    points[i], Quaternion.identity).GetComponent<GarbageCanController>();
                 // GameModel.GarbageCans[i].transform.position = points[i];
                 // GameModel.GarbageCans[i].SetActive(false);
             }
             else
             {
                 //Spawn Tree
-                GameModel.Trees[i - 5] = Instantiate(
+                GameModel.Trees[i - GameModel.NumGarbageCans] = Instantiate(
                     Resources.Load<GameObject>("Tree"), 
-                    points[i], Quaternion.identity);
+                    points[i], Quaternion.identity).GetComponent<TreeController>();
                 // GameModel.Trees[i - 5].transform.position = points[i];
                 // GameModel.Trees[i - 5].SetActive(false);
             }
@@ -63,7 +65,7 @@ public class GameGenerator : MonoBehaviour
         
         // Choose 5 random "home" trees and spawn squirrels.
         // Note that again since our list was randomized we may simply choose the first 5 trees.
-         for (int i = 0; i < 5; i++)
+         for (int i = 0; i < GameModel.NumSquirrels; i++)
          {
              // var r = Random.insideUnitCircle.normalized * (GameModel.TreeTrunkRadius + GameModel.SquirrelRadius);
              // var offsetR = new Vector3(r.x, 0f, r.y);
@@ -75,12 +77,12 @@ public class GameGenerator : MonoBehaviour
                  Resources.Load<GameObject>("Squirrel"),
                  GameModel.Trees[i].transform.position, Quaternion.identity);
              squirrel.name = $"Squirrel({i})";
-             var sController = squirrel.GetComponent<SController>();
-             sController.homeTree = GameModel.Trees[i];
+             squirrel.GetComponent<TargetingSystem>().homeTreeController =
+                 GameModel.Trees[i].GetComponent<TreeController>();
              // squirrel.SetActive(true);
              // sController.squirrelID = i;
              // sController.Memory = new SquirrelMemory(squirrel, GameModel.Trees[i]);
-             GameModel.Squirrels[i] = squirrel;
+             GameModel.Squirrels[i] = squirrel.GetComponent<SController>();
              
              // GameModel.Squirrels[i].transform.rotation = Quaternion.LookRotation(offsetR);
          }
@@ -91,12 +93,12 @@ public class GameGenerator : MonoBehaviour
     // GameModel.Max_X (and for Z), such that the distance between any 2 points is at least MinDistance.
     // We will then randomise the order of the
     // lists and pair the entries of both lists to get our points.
-    private Vector3[] getRandomPoints()
+    private Vector3[] GETRandomPoints(int count)
     {
-        Vector3[] points = new Vector3[15];
+        Vector3[] points = new Vector3[count];
 
-        var xList = GenRandomList(GameModel.MinX, GameModel.MaxX);
-        var zList = GenRandomList(GameModel.MinZ, GameModel.MaxZ);
+        var xList = GenRandomList(GameModel.MinX, GameModel.MaxX, count);
+        var zList = GenRandomList(GameModel.MinZ, GameModel.MaxZ, count);
         
         // Shuffle both lists as they are currently sorted.
         // Note that shuffling one list suffices as we would still get a list of random points in the end,
@@ -112,7 +114,7 @@ public class GameGenerator : MonoBehaviour
         // }
 
         // Pair up the two lists to get our random points in the game area
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < count; i++)
         {
             points[i] = new Vector3(xList[i], 0f, zList[i]);
         }
@@ -121,7 +123,7 @@ public class GameGenerator : MonoBehaviour
     }
 
     // Generate a random list of 15 sparsely separated floats between min and max
-    private float[] GenRandomList(float min, float max)
+    private float[] GenRandomList(float min, float max, int count)
     {
         // Sorted lists of already chosen values
         LinkedList<float> xs = new LinkedList<float>();
@@ -134,7 +136,7 @@ public class GameGenerator : MonoBehaviour
         var dTotal = xs.Last.Value - xs.First.Value - 2 * _minDistance;
 
         // Generate points one by one
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < count; i++)
         {
             //First we will choose which 2 points in xs we want to generate our new point between 
             var r = Random.Range(0f, dTotal);
@@ -152,7 +154,7 @@ public class GameGenerator : MonoBehaviour
             //Now we will choose a new point between cur and cur.Next, then update dTotal accordingly
             var x1 = cur.Value + _minDistance;
             var x2 = cur.Next.Value - _minDistance;
-            var x = getAdjustedRandom(x1, x2);
+            var x = GETAdjustedRandom(x1, x2);
 
             dTotal -= Mathf.Min(_minDistance, x - x1) + Mathf.Min(_minDistance, x2 - x);
             xs.AddAfter(cur, x);
@@ -171,7 +173,7 @@ public class GameGenerator : MonoBehaviour
     // such that we get a random value between min and max.
     // Note that our inverse "S" curve is simply x^3 transformed such that the inverse "S" part of the curve is
     // between 0 and 1, and we intersect the points (0, 0) and (1, 1).
-    private static float getAdjustedRandom(float min, float max)
+    private static float GETAdjustedRandom(float min, float max)
     {
         var r = Random.value;
         var x = 4 * Mathf.Pow(r - 0.5f, 3) + 0.5f;

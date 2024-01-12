@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using Tree;
 using UnityEngine;
 
-namespace GOAP
+namespace Nut
 {
     public class NutController : MonoBehaviour
     {
-        public LinkedListNode<GameObject> Node;
+        public LinkedListNode<NutController> Node;
         public NutSpawner spawner;
         
         public void PickUp()

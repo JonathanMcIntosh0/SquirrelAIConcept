@@ -1,5 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using GarbageCan;
+using GOAP;
+using GOAP.Agent;
+using Nut;
+using Tree;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -29,29 +34,17 @@ public class GameModel : MonoBehaviour
     public const float GarbageCanHeight = 1f;
     public const float FloorHeight = 0.05f;
 
-    public static GameObject[] GarbageCans = new GameObject[5];
-    public static GameObject[] Trees = new GameObject[10];
-    public static GameObject[] Squirrels = new GameObject[5];
-    public static LinkedList<GameObject> Nuts = new LinkedList<GameObject>();
-    // TODO REDO NUT SPAWNING
-    // TODO Create NutController which has field for LLNode (used in onDestroy method).
-    // TODO Also hold either index of respective tree or ref to TreeController to decrement nut count.
+    public const int NumGarbageCans = 5;
+    public const int NumTrees = 10;
+    public const int NumSquirrels = 5; // Must be <= NumTrees
 
-    
-    //TODO maybe move these to within squirrel controller
+    public static GarbageCanController[] GarbageCans = new GarbageCanController[NumGarbageCans];
+    public static TreeController[] Trees = new TreeController[NumTrees];
+    //TODO maybe make squirrels gameObjects since not really single controller but 3 (4 if you count planner)
+    public static SController[] Squirrels = new SController[NumSquirrels]; 
+    public static LinkedList<NutController> Nuts = new LinkedList<NutController>();
+
+    //TODO maybe move these to within squirrel controller (or targeting system)
     public static float SquirrelViewAngle = 45f;
     public static float SquirrelViewDistance = 10f;
-
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

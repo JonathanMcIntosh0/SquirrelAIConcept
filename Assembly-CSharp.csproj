@@ -53,37 +53,33 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\GameGenerator.cs" />
-     <Compile Include="Assets\Scripts\Actions\GoToLocation.cs" />
-     <Compile Include="Assets\Scripts\Actions\SquirrelAction.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\WanderAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Actions\GatherGarbageAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\NavigationSystem.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\PathPlanner.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\SController.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Agent\TargetingSystem.cs" />
+     <Compile Include="Assets\Scripts\Nut\NutController.cs" />
+     <Compile Include="Assets\Scripts\Nut\NutSpawner.cs" />
      <Compile Include="Assets\Scripts\Tree\TreeController.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Goals\FleeGoal.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\BaseAction.cs" />
      <Compile Include="Assets\Scripts\GOAP\WorldState.cs" />
-     <Compile Include="Assets\Scripts\Squirrel\WorldVector.cs" />
-     <Compile Include="Assets\Scripts\TransformExtension.cs" />
-     <Compile Include="Assets\Scripts\Actions\ClimbUp.cs" />
-     <Compile Include="Assets\Scripts\Squirrel\SquirrelController.cs" />
+     <Compile Include="Assets\Scripts\VectorExtension.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\GatherNutAction.cs" />
-     <Compile Include="Assets\Scripts\Actions\GoToGameObject.cs" />
-     <Compile Include="Assets\Scripts\ActionList.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\GameModel.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\GarbageCanController.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\WanderGoal.cs" />
-     <Compile Include="Assets\Scripts\GOAP\NavigationSystem.cs" />
-     <Compile Include="Assets\Scripts\GOAP\PathPlanner.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\ExploreGoal.cs" />
      <Compile Include="Assets\Scripts\IClimbable.cs" />
      <Compile Include="Assets\Scripts\GOAP\Target.cs" />
-     <Compile Include="Assets\Scripts\GOAP\NutController.cs" />
-     <Compile Include="Assets\Scripts\Actions\ISquirrelAction.cs" />
-     <Compile Include="Assets\Scripts\SquirrelMemory.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Goals\StockFoodGoal.cs" />
      <Compile Include="Assets\Scripts\GOAP\Goals\BaseGoal.cs" />
-     <Compile Include="Assets\Scripts\GOAP\NutSpawner.cs" />
-     <Compile Include="Assets\Scripts\Actions\ClimbDown.cs" />
-     <Compile Include="Assets\Scripts\GOAP\SController.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Actions\RunAwayAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Actions\HideAction.cs" />
+     <Compile Include="Assets\Scripts\GOAP\Actions\StoreInventoryAction.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\State.cs" />
-     <Compile Include="Assets\Scripts\GOAP\TargetingSystem.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.20f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
@@ -683,6 +679,7 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\Scripts\Squirrel" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

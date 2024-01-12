@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace GOAP
+namespace Nut
 {
     [Serializable]
     public class NutSpawner
     {
         [SerializeField] public int nutCount = 0;
-        [SerializeField] private LinkedListNode<GameObject> _head = null;
+        [SerializeField] private LinkedListNode<NutController> _head = null;
         
         public bool SpawnNut(Vector3 location)
         {
@@ -22,8 +22,8 @@ namespace GOAP
             nutController.spawner = this;
             
             var resNode = (_head == null) ? 
-                GameModel.Nuts.AddLast(nut) : 
-                GameModel.Nuts.AddAfter(_head, nut);
+                GameModel.Nuts.AddLast(nutController) : 
+                GameModel.Nuts.AddAfter(_head, nutController);
             _head ??= resNode;
             nutController.Node = resNode;
             
@@ -31,7 +31,7 @@ namespace GOAP
             return true;
         }
 
-        public void RemoveNut(LinkedListNode<GameObject> node)
+        public void RemoveNut(LinkedListNode<NutController> node)
         {
             if (--nutCount == 0) _head = null;
             else if (node == _head) _head = _head.Next;
@@ -44,7 +44,7 @@ namespace GOAP
         // Another way would be to pass nutSpawners we want to check
         private bool ValidateLocation(Vector3 location)
         {
-            return GameModel.Nuts.Any(nut => 
+            return !GameModel.Nuts.Any(nut => 
                 Vector3.Distance(nut.transform.position, location) <= GameModel.NutRadius + 0.1f);
         }
     }

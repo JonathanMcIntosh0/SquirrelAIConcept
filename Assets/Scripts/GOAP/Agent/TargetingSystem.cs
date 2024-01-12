@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Tree;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace GOAP
+namespace GOAP.Agent
 {
     [RequireComponent(typeof(SController))]
     public class TargetingSystem : MonoBehaviour
     {
-        private SController _controller;
-        private Transform _transform;
+        private Transform _transform; // Cache transform for quick access
+        public TreeController homeTreeController; // Gets set by GameGenerator
+        private PlayerController _playerController;
 
         [Header("Memory Sizes")]
         [SerializeField] private int nutMemorySize = 5;
@@ -20,7 +23,7 @@ namespace GOAP
         
         [Header("Targets")]
         //TODO Maybe change homeTreeTarget get so we do not return if (inFOV && !isUsable)
-        public Target homeTreeTarget; // Needs to be created on start
+        [SerializeField] public Target homeTreeTarget; // Needs to be created on start
         [SerializeField] private List<Target> targetsInFOV = new List<Target>();
         [SerializeField] private List<Target> targetsInMemory = new List<Target>();
         
@@ -30,13 +33,13 @@ namespace GOAP
         private void Awake()
         {
             Random.InitState(DateTime.Now.Millisecond); //Set random seed
-            _controller = gameObject.GetComponent<SController>();
             _transform = transform;
+            _playerController = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
         }
 
         private void Start()
         {
-            homeTreeTarget = new Target(_controller.homeTree, TargetType.HomeTree, TargetState.InMemory);
+            homeTreeTarget = new Target(homeTreeController, TargetType.HomeTree, TargetState.InMemory);
         }
 
         private void LateUpdate()
@@ -59,7 +62,8 @@ namespace GOAP
                 if (IsInFOV(target.location))
                 {
                     target.state = TargetState.InFOV;
-                    if (target.obj == null) continue; // skip collected nuts
+                    // skip collected nuts (don't skip trees or cans)
+                    if (target.objController == null) continue; 
                     newTargetsInFOV.Add(target);
                 } 
                 else if (counts[(int) target.type] < maxMemSizes[(int) target.type] 
@@ -81,15 +85,16 @@ namespace GOAP
             //     where !visitedObjects.ContainsKey(obj) && IsInFOV(obj.transform.position)
             //     select obj;
 
-            var objsVisited = targetsInFOV.Concat(targetsInMemory).Select(target => target.obj);
+            var objControllersVisited = 
+                targetsInFOV.Concat(targetsInMemory).Select(target => target.objController);
 
             newTargetsInFOV.AddRange(
-                from obj in GameModel.Nuts
-                    .Concat(GameModel.GarbageCans)
-                    .Concat(GameModel.Trees)
-                    .Except(objsVisited)
-                where IsInFOV(obj.transform.position)
-                select new Target(obj, TargetState.InFOV));
+                from objController in GameModel.Nuts
+                    .Concat<MonoBehaviour>(GameModel.GarbageCans)
+                    .Concat<MonoBehaviour>(GameModel.Trees)
+                    .Except<MonoBehaviour>(objControllersVisited)
+                where IsInFOV(objController.transform.position.GetHorizVector2())
+                select new Target(objController, TargetState.InFOV));
 
             targetsInFOV = newTargetsInFOV;
             targetsInMemory = newTargetsInMem;
@@ -121,25 +126,42 @@ namespace GOAP
             return new Target(targetLoc);
         }
         
-        //TODO maybe add capability to return homeTreeTarget
-        public List<Target> GetTargetsOfType(TargetType type)
+        public Target GetRunAwayTarget(float distance, Vector2 fromLoc)
+        {
+            Vector3 source = new Vector3(fromLoc.x, GameModel.FloorHeight, fromLoc.y);
+            Vector2 targetLoc = fromLoc;
+            
+            source += distance * (source - _playerController.transform.position).normalized;
+
+            if (NavMesh.SamplePosition(source, out var closestHit, 5f, NavMesh.AllAreas))
+                targetLoc = closestHit.position.GetHorizVector2();
+            
+            return new Target(targetLoc);
+        }
+        
+        [NotNull] public List<Target> GetTargetsOfType(TargetType type)
         {
             if (!Target.IsDetectable(type)) // Safety check
-                return null;
+                return new List<Target>();
             
             return new List<Target>(
                 targetsInFOV
-                    .Where(target => target.IsUsable()) // Filter out targets in FOV that are not usable
+                    // .Where(target => target.IsUsable()) // Filter out targets in FOV that are not usable
                     .Concat(targetsInMemory)
                     .Where(target => target.type == type));
         }
         
-        private bool IsInFOV(Vector3 posToCheck)
+        private bool IsInFOV(Vector2 posToCheck)
         {
-            var angle = Vector3.Angle(_curForward, posToCheck - _curPos);
-            var distance = Vector3.Distance(_curPos, posToCheck);
-            return distance <= GameModel.SquirrelViewDistance
-                   && angle <= GameModel.SquirrelViewAngle;
+            var pos = new Vector3(posToCheck.x, GameModel.FloorHeight, posToCheck.y);
+            // var angle = Vector3.Angle(_curForward, pos - _curPos);
+            var distance = Vector3.Distance(_curPos, pos);
+            return distance <= GameModel.SquirrelViewDistance;
+            
+            // Allow close objects (within distance <= 0.5f) to be "seen"
+            // return distance <= 0.5f || 
+            //        distance <= GameModel.SquirrelViewDistance
+            //        && angle <= GameModel.SquirrelViewAngle;
         }
         
     }

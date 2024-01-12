@@ -12,7 +12,8 @@ namespace GOAP
         
         public int nutsCarried;
         public int garbageCarried;
-        
+        public float inventoryFill; // Value between 0 and 1 indicating how full is inventory
+
         public bool isPlayerNear;
         public bool isInventoryFull;
         

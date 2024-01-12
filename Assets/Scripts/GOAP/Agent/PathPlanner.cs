@@ -4,9 +4,8 @@ using System.Linq;
 using GOAP.Actions;
 using GOAP.Goals;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace GOAP
+namespace GOAP.Agent
 {
     public enum PlanResult
     {
@@ -126,18 +125,23 @@ namespace GOAP
         
         private void Update()
         {
-            _curState = _controller.curState;
+            if (_controller.isTrapped) // Do not plan while trapped
+            {
+                _curPlan = null; // Stop current plan
+                return;
+            } 
+            
             goals.ForEach(goal => goal.RefreshPriority());
+            _curState = _controller.curState;
             
             // TODO don't actually need to find highest priority goal. Just see if HIGHER priority goal exists.
             var highestPriorityGoal = goals
-                .Where(goal => goal.PreCondition(_curState))
+                .Where(goal => goal.enabled && goal.PreCondition(_curState))
                 .Aggregate(_curPlan?.Goal,
                     (newGoal, nextGoal) =>
-                        newGoal == null || nextGoal.Priority > newGoal.Priority
+                        newGoal is null || nextGoal.Priority > newGoal.Priority
                             ? nextGoal
                             : newGoal);
-            
             
             if (_curPlan == null || _curPlan.Goal != highestPriorityGoal)
                 Replan();
@@ -156,7 +160,7 @@ namespace GOAP
 
             var planQuery =
                 from goal in goals
-                where goal.PreCondition(_curState)
+                where goal.enabled && goal.PreCondition(_curState)
                 let plan = BuildPlan(goal)
                 where plan != null
                 select plan;
@@ -183,6 +187,7 @@ namespace GOAP
         {
             if (goal.PostCondition(_curState)) return null;
 
+            //TODO maybe make openList a minHeap
             List<Node> openList = new List<Node>();
             ExpandNode(openList, new Node(goal, _curState), goal);
 
@@ -199,15 +204,21 @@ namespace GOAP
                 ExpandNode(openList, minNode, goal);
             }
 
-            Debug.Log($"{gameObject.name}: Could not find plan - openList.Count = {openList.Count}, iter = {iterations}\n");
+            // Debug.Log($"{gameObject.name}: Could not find plan for {goal} - openList.Count = {openList.Count}, iter = {iterations}\n");
             return null;
         }
         
         private void ExpandNode(List<Node> openList, Node workingNode, BaseGoal goal)
         {
+            IEnumerable<BaseAction> actionList;
+            if (goal is WanderGoal || goal is ExploreGoal)
+                actionList = actions.Where(action => action is WanderAction);
+            else
+                actionList = actions.Where(action => !(action is WanderAction));
+            
             openList.AddRange(
-                from action in actions 
-                where action.PreCondition(workingNode.State) 
+                from action in actionList 
+                where action.enabled && action.PreCondition(workingNode.State) 
                 from target in action.GetTargets(workingNode.State) 
                 where target.type != TargetType.Nut || !workingNode.HasUsedTarget(target) 
                 let nextState = action.CalculateState(workingNode.State, target) 

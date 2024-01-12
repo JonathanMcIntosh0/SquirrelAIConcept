@@ -19,7 +19,6 @@ namespace GarbageCan
         }
         private bool _hasSquirrel;
         public float MaxHeight => GameModel.GarbageCanHeight;
-    
 
         public State State
         {
@@ -31,7 +30,7 @@ namespace GarbageCan
                 _state = value;
             }
         }
-        private State _state;
+        private State _state; //Note: Should never directly set
 
         private Renderer _renderer;
         private float _timeSinceLastChange = 0f;
@@ -51,16 +50,35 @@ namespace GarbageCan
         void Update()
         {
             _timeSinceLastChange += Time.deltaTime;
-        
+
+            if (_timeSinceLastChange >= 2f && State == State.Trap)
+                State = State.Empty;
+            else if (_timeSinceLastChange >= 10f)
+                FlipState();
+
             // If least 10 sec have passed and not hasSquirrel then changeState
             // Note that when a squirrel leaves we reset _timeSinceLastChange to 0
-            if (_timeSinceLastChange >= 10f && !_hasSquirrel) 
-            {
-                FlipState();
-            }
+            
+            // else if (_timeSinceLastChange >= 10f && !_hasSquirrel) 
+            // {
+            //     FlipState();
+            // }
 
         }
 
+        public bool TryGetGarbage()
+        {
+            if (State == State.Empty)
+            {
+                State = State.Trap;
+                return false;
+            }
+
+            // Should always be in Full state here
+            State = State.Empty;
+            return true;
+        }
+        
         private void FlipState()
         {
             State = State switch

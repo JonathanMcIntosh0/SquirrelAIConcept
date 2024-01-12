@@ -3,30 +3,29 @@ using UnityEngine;
 
 namespace GOAP.Actions
 {
-    public class WanderAction : BaseAction
+    public class RunAwayAction : BaseAction
     {
-        [SerializeField] private int numberOfTargets = 10;
-        [SerializeField] private float randomRange = 3f;
+        [SerializeField] private float distance = 3f;
         public override bool PreCondition(WorldState cur)
         {
-            return !cur.isPlayerNear;
+            return cur.isPlayerNear;
         }
 
         public override WorldState? CalculateState(WorldState cur, Target target)
         {
             Controller.MoveStateTo(ref cur, target.location, GameModel.FloorHeight);
+            Controller.SetIsPlayerNear(ref cur, false);
             return cur;
+        }
+
+        public override float GetCost(WorldState cur, Target target)
+        {
+            return float.PositiveInfinity;
         }
 
         public override List<Target> GetTargets(WorldState cur)
         {
-            var targets = new List<Target>();
-            for (int i = 0; i < numberOfTargets; i++)
-            {
-                targets.Add(TarSystem.GetRandomLocationTarget(randomRange, cur.location));
-            }
-
-            return targets;
+            return new List<Target> {TarSystem.GetRunAwayTarget(distance, cur.location)};
         }
 
         protected override ActionResult Tick_ClimbUp(Target target)
