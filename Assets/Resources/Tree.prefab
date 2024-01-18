@@ -145,7 +145,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a498866123a0ecd4b852230ee340bcd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nuts: []
+  nutSpawner:
+    nutCount: 0
+  maxNutCount: 5
+  timeSinceLastSpawn: 0
+  spawnDelay: 5
 --- !u!208 &4194675703043213585
 NavMeshObstacle:
   m_ObjectHideFlags: 0

@@ -22,13 +22,8 @@ public class GameGenerator : MonoBehaviour
      * within our game area.
      */
 
-    //Min value for coordinate wise distance between 2 randomly generated points (or wall)
-    private float _minDistance; 
-    
     public void GenerateGame()
     {
-        _minDistance = Mathf.Max(GameModel.TreeRadius, GameModel.GarbageCanRadius);
-        
         Random.InitState(DateTime.Now.Millisecond); //Set random seed
         
         // Get 15 random points within our game area and randomly choose 5 of them to be garbage bins and the rest trees.
@@ -90,78 +85,79 @@ public class GameGenerator : MonoBehaviour
     {
         Vector3[] points = new Vector3[count];
 
-        var xList = GenRandomList(GameModel.MinX, GameModel.MaxX, count);
-        var zList = GenRandomList(GameModel.MinZ, GameModel.MaxZ, count);
+        var minDistance = 2 * Mathf.Max(GameModel.TreeRadius, GameModel.GarbageCanRadius);
+        var pts = GenRandomPoints(
+            GameModel.MinX, GameModel.MaxX, 
+            GameModel.MinZ, GameModel.MaxZ, 
+            minDistance, count);
         
-        // Shuffle both lists as they are currently sorted.
-        // Note that shuffling one list suffices as we would still get a list of random points in the end,
-        // however we would still have some ordering to the list of points we return. If we shuffle both lists then
-        // not only do we get a list of random points within our game area, but the list itself is also randomized.
-        ShuffleList(xList);
-        ShuffleList(zList);
-
-        // for (int i = 0; i < 14; i++)
-        // {
-        //     var r = Random.Range(i, 15);
-        //     (xList[i], xList[r]) = (xList[r], xList[i]); //swap the values at index i and r
-        // }
-
-        // Pair up the two lists to get our random points in the game area
         for (int i = 0; i < count; i++)
         {
-            points[i] = new Vector3(xList[i], 0f, zList[i]);
+            points[i] = new Vector3(pts[i].x, 0f, pts[i].y);
         }
 
         return points;
     }
-
-    private void Start()
-    {
-        
-    }
-
+    
     // Generate a random list of 15 sparsely separated floats between min and max
-    private float[] GenRandomList(float min, float max, int count)
+    private static List<Vector2> GenRandomPoints(float minX, float maxX, float minY, float maxY, float minDistance, int count)
     {
         // Sorted lists of already chosen values
-        LinkedList<float> xs = new LinkedList<float>();
+        List<Vector2> pts = new List<Vector2>(count);
 
-        // Add boundary coordinate components
-        xs.AddFirst(min);
-        xs.AddLast(max);
-
-        //DTotal is the total "valid" distance for which we can choose a new point from. We will update this as we add new points.
-        var dTotal = xs.Last.Value - xs.First.Value - 2 * _minDistance;
-
-        // Generate points one by one
-        for (int i = 0; i < count; i++)
+        const int maxFails = 50;
+        var fails = 0;
+        while (pts.Count < count && fails < maxFails)
         {
-            //First we will choose which 2 points in xs we want to generate our new point between 
+            var x = Random.Range(minX + minDistance, maxX - minDistance);
+            // Get sorted list of points (ordered by y val) within (x - 2 * _minDistance, x + 2 * _minDistance)
+            // List<float> ys = pts.Where(v => x - 2 * _minDistance < v.x && v.x < x + 2 * _minDistance).Select(p => p.y).ToList();
+            List<float> ys = new List<float>();
+            ys.Add(minY);
+            ys.AddRange(
+                from p in pts
+                where x - minDistance < p.x && p.x < x + minDistance
+                orderby p.y select p.y);
+            ys.Add(maxY);
+
+            var prevY = minY;
+            var dTotal = ys.Aggregate(0f, (acc, y) =>
+            {
+                var res = Mathf.Max(0f, y - prevY - 2 * minDistance);
+                prevY = y;
+                return acc + res;
+            });
+            // }, acc => acc + Mathf.Max(0f, maxY - prevY - 2 * _minDistance));
+
+            if (dTotal == 0)
+            {
+                fails++;
+                continue;
+            }
+
+            //Choose which 2 y in ys we want to generate our new point between 
             var r = Random.Range(0f, dTotal);
-            var cur = xs.First;
-            // Here we let s be the sum of "valid" distances between points in xs until cur.Next 
-            var s = Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * _minDistance);
+            var curIdx = 0;
+            // Let s be the sum of "valid" distances between y in ys until cur.Next 
+            var s = Mathf.Max(0f, ys[curIdx + 1] - ys[curIdx] - 2 * minDistance);
             // Iterate until r <= s. If r <= s then we choose our next point between cur and cur.Next
             while (r > s)
             {
                 // Update cur and s
-                cur = cur.Next;
-                s += Mathf.Max(0f, cur.Next.Value - cur.Value - 2 * _minDistance);
+                curIdx++;
+                s += Mathf.Max(0f, ys[curIdx + 1] - ys[curIdx] - 2 * minDistance);
             }
             
-            //Now we will choose a new point between cur and cur.Next, then update dTotal accordingly
-            var x1 = cur.Value + _minDistance;
-            var x2 = cur.Next.Value - _minDistance;
-            var x = GETAdjustedRandom(x1, x2);
-
-            dTotal -= Mathf.Min(_minDistance, x - x1) + Mathf.Min(_minDistance, x2 - x);
-            xs.AddAfter(cur, x);
+            //Now we will choose a new point between cur and cur.Next
+            var y1 = ys[curIdx] + minDistance;
+            var y2 = ys[curIdx + 1] - minDistance;
+            var y = GETAdjustedRandom(y1, y2); // Adjust to be more centralised
+            
+            pts.Add(new Vector2(x, y));
         }
-        
-        //We now remove the boundary points and return our list of random floats
-        xs.RemoveFirst();
-        xs.RemoveLast();
-        return xs.ToArray();
+
+        if (fails >= maxFails) Debug.LogError($"Not enough space to generate {count} random points!");
+        return pts;
     }
 
     // Returns a random float between min and max (inclusive) according to a pseudo normalised distribution,
@@ -177,15 +173,4 @@ public class GameGenerator : MonoBehaviour
         var x = 4 * Mathf.Pow(r - 0.5f, 3) + 0.5f;
         return min + x * (max - min);
     }
-
-    private static T[] ShuffleList<T>(T[] l)
-    {
-        for (int i = 0; i < l.Length - 1; i++)
-        {
-            var r = Random.Range(i, l.Length);
-            (l[i], l[r]) = (l[r], l[i]); //swap the values at index i and r
-        }
-
-        return l;
-    } 
 }

@@ -757,6 +757,69 @@ Transform:
   m_Father: {fileID: 1372117112}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1065395067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1065395070}
+  - component: {fileID: 1065395069}
+  - component: {fileID: 1065395068}
+  m_Layer: 0
+  m_Name: StressGameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1065395068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065395067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5539d443a0fbacf4a9f1add33c69c505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1065395069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065395067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2ae2195f90b7134ca9d885ee9666933, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minX: 0
+  minZ: 0
+  maxX: 75
+  maxZ: 75
+  numGarbageCans: 20
+  numTrees: 50
+  numSquirrels: 50
+--- !u!4 &1065395070
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065395067}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1084161285
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,8 +881,8 @@ MonoBehaviour:
   maxX: 75
   maxZ: 75
   numGarbageCans: 5
-  numTrees: 15
-  numSquirrels: 10
+  numTrees: 10
+  numSquirrels: 5
 --- !u!1 &1092992185 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4716711868799646379, guid: 734e5e43fbfeb9743b9943ff1b53f784, type: 3}
