@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,16 +5,18 @@ public class PlayerController : MonoBehaviour
     public CharacterController characterController;
     public Transform cameraTransform;
     
-    public float walkSpeed = 15f;
-    public float sprintSpeed = 30f;
+    [SerializeField] private float walkSpeed = 15f;
+    [SerializeField] private float sprintSpeed = 30f;
 
     private Transform _tf;
     private bool _isInSprint;
     private float _speed;
     
-    public float mouseSensitivity = 150f;
+    [SerializeField] private float mouseSensitivity = 150f;
 
     private float _xRotation = 0f;
+
+    public bool isGhosted = false;
 
     void Start ()
     {
@@ -29,6 +29,12 @@ public class PlayerController : MonoBehaviour
 	
     // Update is called once per frame
     void Update () {
+        // Deal with ghost toggle
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isGhosted = !isGhosted;
+        }
+        
         // Deal with player movement
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {

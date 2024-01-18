@@ -2,7 +2,6 @@
 using Nut;
 using Tree;
 using UnityEngine;
-using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -22,8 +21,8 @@ namespace GOAP.Agent
         public PlayerController playerController;
 
         [Header("Settings")]
-        [SerializeField] private int nutInventorySize = 3;
-        [SerializeField] private int garbageInventorySize = 1;
+        [SerializeField] public int nutInventorySize = 3;
+        [SerializeField] public int garbageInventorySize = 1;
 
         [Header("State info")]
         public WorldState curState;
@@ -62,8 +61,8 @@ namespace GOAP.Agent
         
         private void UpdateStateLocation(Vector3 location)
         {
-            bool isPlayerNear = Vector3.Distance(location, playerController.transform.position) 
-                                <= GameModel.SquirrelViewDistance;
+            bool isPlayerNear = !playerController.isGhosted 
+                                && Vector3.Distance(location, playerController.transform.position) <= GameModel.SquirrelViewDistance;
             SetIsPlayerNear(ref curState, isPlayerNear);
             MoveStateTo(ref curState, location.GetHorizVector2(), location.y);
         }

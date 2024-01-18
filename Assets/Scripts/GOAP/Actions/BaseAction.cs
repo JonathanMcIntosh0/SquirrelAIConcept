@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using GarbageCan;
 using GOAP.Agent;
 using JetBrains.Annotations;
+using Nut;
+using Tree;
 using UnityEngine;
 
 namespace GOAP.Actions
@@ -37,7 +40,18 @@ namespace GOAP.Actions
 
         public virtual float GetCost(WorldState cur, Target target)
         {
-            return Vector2.Distance(cur.location, target.location);
+            var h = target.objController switch
+            {
+                NutController _ => GameModel.FloorHeight,
+                GarbageCanController _ => GameModel.GarbageCanHeight,
+                TreeController _ => GameModel.SquirrelHomeHeight,
+                null => GameModel.FloorHeight, // Location type
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            var d = Vector2.Distance(cur.location, target.location);
+            
+            // Note: Cost a little off if currently on target (Adds cost to go down to floor and back up to h) 
+            return d + h + cur.height;
         }
 
         public ActionResult Tick(Target target)
@@ -64,7 +78,7 @@ namespace GOAP.Actions
 
         protected virtual ActionResult Tick_MoveHorizontally(Target target)
         {
-            NavSystem.SetHorizDestination(target.location);
+            NavSystem.SetHorizDestination(target.location, target.objController as IClimbable);
             if (NavSystem.ReachedDestination) return ActionResult.Success; // Check if already there
 
             if (target.state == TargetState.Forgotten 
@@ -76,11 +90,12 @@ namespace GOAP.Actions
 
         protected virtual ActionResult Tick_ClimbUp(Target target)
         {
-            if (!(target.objController is IClimbable climbable) || !NavSystem.ClimbUp(climbable)) 
-                return ActionResult.Fail;
+            // Default success if not climbable object
+            if (!(target.objController is IClimbable climbable)) return ActionResult.Success; 
+            if (!NavSystem.ClimbUp(climbable)) return ActionResult.Fail;
             return NavSystem.ReachedDestination ? ActionResult.Success : ActionResult.Running;
         }
-        protected abstract ActionResult Tick_Use(Target target);
+        protected abstract ActionResult Tick_Use(Target target); // Could make this default to success
 
         public virtual void Reset()
         {
@@ -98,6 +113,11 @@ namespace GOAP.Actions
         private void Start()
         {
             
+        }
+
+        public override string ToString()
+        {
+            return GetType().Name;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using GOAP.Actions;
 using GOAP.Goals;
 using UnityEngine;
@@ -96,12 +97,15 @@ namespace GOAP.Agent
 
             public override string ToString()
             {
-                var s = $"Goal = {Goal}, Cost = {Cost}\n";
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"Goal = {Goal}, Cost = {Cost}");
+                sb.AppendLine($"Current Action = {_curIndex}");
+                sb.AppendLine("Action List:");
                 for (int i = 0; i < Actions.Count; i++)
                 {
-                    s += $"{Actions[i].name} - {Targets[i]}\n";
+                    sb.AppendLine($"[{i}]{Actions[i]} - {Targets[i]}");
                 }
-                return s;
+                return sb.ToString();
             }
         }
 
@@ -114,6 +118,7 @@ namespace GOAP.Agent
         
         private Plan _curPlan = null;
         public bool HasPlan => _curPlan != null;
+        public string PlanText => _curPlan != null ? _curPlan.ToString() : "No current plan!";
 
         private void Awake()
         {

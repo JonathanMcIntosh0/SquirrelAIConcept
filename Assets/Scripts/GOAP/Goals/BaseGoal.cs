@@ -1,5 +1,4 @@
-﻿using System;
-using GOAP.Agent;
+﻿using GOAP.Agent;
 using UnityEngine;
 
 namespace GOAP.Goals
@@ -24,6 +23,7 @@ namespace GOAP.Goals
         }
 
         protected SController Controller;
+        protected TargetingSystem TarSystem;
 
         public abstract bool PreCondition(WorldState cur);
         public abstract bool PostCondition(WorldState next);
@@ -33,6 +33,7 @@ namespace GOAP.Goals
         private void Awake()
         {
             Controller = GetComponent<SController>();
+            TarSystem = GetComponent<TargetingSystem>();
         }
 
         //Empty start method to allow enable/disable for debug purposes

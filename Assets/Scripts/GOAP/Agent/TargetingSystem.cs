@@ -150,6 +150,12 @@ namespace GOAP.Agent
                     .Concat(targetsInMemory)
                     .Where(target => target.type == type));
         }
+
+        public int GetTargetCountOfType(TargetType type)
+        {
+            return !Target.IsDetectable(type) ? 0 
+                : targetsInFOV.Concat(targetsInMemory).Count(target => target.type == type);
+        }
         
         private bool IsInFOV(Vector2 posToCheck)
         {

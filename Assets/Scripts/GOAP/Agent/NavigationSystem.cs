@@ -9,7 +9,8 @@ namespace GOAP.Agent
     {
         private PathPlanner _planner;
         [SerializeField] private NavMeshAgent agent;
-        
+
+        [SerializeField] public int avoidancePriority; // Set by GameGenerator
         [SerializeField] private float climbSpeed = 5f;
 
         [Header("Navigation")]
@@ -35,6 +36,7 @@ namespace GOAP.Agent
                 agent.agentTypeID = 0;
                 agent.height = 1;
                 agent.radius = 0.3f;
+                agent.avoidancePriority = avoidancePriority;
             } else Debug.LogError("Could not find spawn position on NavMesh!");
         }
 
@@ -105,7 +107,7 @@ namespace GOAP.Agent
             agent.isStopped = true;
         }
 
-        public void SetHorizDestination(Vector2 loc)
+        public void SetHorizDestination(Vector2 loc, IClimbable obj = null)
         {
             if (destinationSet && loc == offMeshDestination) return; // Destination already set
             offMeshDestination = loc;
@@ -115,7 +117,8 @@ namespace GOAP.Agent
                 destination = transform.position;
             else
             {
-                var sourcePos = new Vector3(loc.x, GameModel.FloorHeight, loc.y);
+                var sourcePos = obj?.GetPointNearestTo(transform.position.GetHorizVector2()) 
+                                ?? new Vector3(loc.x, GameModel.FloorHeight, loc.y);
                 NavMesh.SamplePosition(sourcePos, out var closestHit, 5f, NavMesh.AllAreas);
 
                 destination = closestHit.position;
@@ -156,6 +159,7 @@ namespace GOAP.Agent
 
         public bool CanClimb(IClimbable obj)
         {
+            if (obj == null) return false;
             return _curObj == obj || !obj.IsOccupied;
         }
     }

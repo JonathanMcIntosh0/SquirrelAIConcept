@@ -14,7 +14,12 @@
 
         public override void RefreshPriority()
         {
-            priority = (Controller.curState.inventoryFill >= .5) ? PriorityLevel.High : PriorityLevel.Medium;
+            var nutCount = TarSystem.GetTargetCountOfType(TargetType.Nut);
+            var garbageCount = TarSystem.GetTargetCountOfType(TargetType.GarbageCan);
+            priority = (nutCount < Controller.nutInventorySize - Controller.curState.nutsCarried
+                        || garbageCount < Controller.garbageInventorySize - Controller.curState.garbageCarried)
+                ? PriorityLevel.Low
+                : PriorityLevel.High;
         }
 
         public override float GetCost(WorldState next, float cost)

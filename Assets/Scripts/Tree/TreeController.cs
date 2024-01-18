@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using GOAP;
 using Nut;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -13,6 +10,11 @@ namespace Tree
         // Climbable properties
         public bool IsOccupied { get; set; } = false;
         public float MaxHeight => GameModel.SquirrelHomeHeight;
+        public Vector3 GetPointNearestTo(Vector2 loc)
+        {
+            var loc3 = new Vector3(loc.x, GameModel.FloorHeight, loc.y);
+            return Vector3.MoveTowards(transform.position, loc3, GameModel.TreeTrunkRadius);
+        }
 
         // public List<GameObject> nuts = new List<GameObject>(5);
         [SerializeField] private NutSpawner nutSpawner;

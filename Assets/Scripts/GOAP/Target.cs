@@ -134,8 +134,7 @@ namespace GOAP
 
         public override string ToString()
         {
-            var obj = (objController == null) ? null : objController.gameObject;
-            return $"(Type = {type}, Loc = {location}, Obj = {obj}, State = {state})";
+            return $"(Type = {type}, Loc = {location}, State = {state}, Usable = {IsUsable()})";
         }
     }
 }

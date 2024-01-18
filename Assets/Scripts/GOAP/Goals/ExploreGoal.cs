@@ -24,7 +24,7 @@ namespace GOAP.Goals
             // So want to wander around it and wait instead of explore
             // Note: Wander Priority is opposite
             
-            priority = Controller.curState.isInventoryFull ? PriorityLevel.VeryLow : PriorityLevel.Low;
+            priority = Controller.curState.isInventoryFull ? PriorityLevel.Low : PriorityLevel.Medium;
         }
 
         public override float GetCost(WorldState next, float cost)

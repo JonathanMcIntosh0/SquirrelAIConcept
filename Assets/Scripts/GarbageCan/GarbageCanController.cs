@@ -19,6 +19,11 @@ namespace GarbageCan
         }
         private bool _hasSquirrel;
         public float MaxHeight => GameModel.GarbageCanHeight;
+        public Vector3 GetPointNearestTo(Vector2 loc)
+        {
+            var loc3 = new Vector3(loc.x, GameModel.FloorHeight, loc.y);
+            return Vector3.MoveTowards(transform.position, loc3, GameModel.GarbageCanRadius);
+        }
 
         public State State
         {

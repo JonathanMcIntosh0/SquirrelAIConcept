@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\GOAP\WorldState.cs" />
      <Compile Include="Assets\Scripts\VectorExtension.cs" />
      <Compile Include="Assets\Scripts\GOAP\Actions\GatherNutAction.cs" />
+     <Compile Include="Assets\Scripts\CanvasController.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\GameModel.cs" />
      <Compile Include="Assets\Scripts\GarbageCan\GarbageCanController.cs" />

@@ -1,15 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GarbageCan;
-using GOAP;
 using GOAP.Agent;
 using Tree;
-using UnityEditor.AI;
 using UnityEngine;
-using UnityEngine.AI;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class GameGenerator : MonoBehaviour
@@ -28,12 +23,12 @@ public class GameGenerator : MonoBehaviour
      */
 
     //Min value for coordinate wise distance between 2 randomly generated points (or wall)
-    private readonly float _minDistance = Mathf.Max(GameModel.TreeRadius, GameModel.GarbageCanRadius); 
+    private float _minDistance; 
     
-    
-    // Start is called before the first frame update
-    void Awake()
+    public void GenerateGame()
     {
+        _minDistance = Mathf.Max(GameModel.TreeRadius, GameModel.GarbageCanRadius);
+        
         Random.InitState(DateTime.Now.Millisecond); //Set random seed
         
         // Get 15 random points within our game area and randomly choose 5 of them to be garbage bins and the rest trees.
@@ -79,12 +74,10 @@ public class GameGenerator : MonoBehaviour
              squirrel.name = $"Squirrel({i})";
              squirrel.GetComponent<TargetingSystem>().homeTreeController =
                  GameModel.Trees[i].GetComponent<TreeController>();
-             // squirrel.SetActive(true);
-             // sController.squirrelID = i;
-             // sController.Memory = new SquirrelMemory(squirrel, GameModel.Trees[i]);
+             // Make it so squirrels have different priorities to prevent getting stuck on each other
+             squirrel.GetComponent<NavigationSystem>().avoidancePriority = 50 + i;
              GameModel.Squirrels[i] = squirrel.GetComponent<SController>();
-             
-             // GameModel.Squirrels[i].transform.rotation = Quaternion.LookRotation(offsetR);
+
          }
         
     }
@@ -120,6 +113,11 @@ public class GameGenerator : MonoBehaviour
         }
 
         return points;
+    }
+
+    private void Start()
+    {
+        
     }
 
     // Generate a random list of 15 sparsely separated floats between min and max
