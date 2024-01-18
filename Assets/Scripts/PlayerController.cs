@@ -29,6 +29,12 @@ public class PlayerController : MonoBehaviour
 	
     // Update is called once per frame
     void Update () {
+        // Deal with quit
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        
         // Deal with ghost toggle
         if (Input.GetKeyDown(KeyCode.Space))
         {

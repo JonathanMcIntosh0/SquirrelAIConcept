@@ -1,5 +1,6 @@
 # Release
-To play current build just download zip file from [latest release](https://github.com/JonathanMcIntosh0/SquirrelAIConcept/releases/latest) (no need for source code). Unzip and run SquirrelAIConcept.exe. 
+To play current build just download zip file from [latest release](https://github.com/JonathanMcIntosh0/SquirrelAIConcept/releases/latest) 
+(no need for source code). Unzip and run SquirrelAIConcept.exe. 
 
 # Controls
 
@@ -37,7 +38,7 @@ Targets can either be in memory or currently in sight.
 When a target moves out of sight, it gets stored in memory.
 A squirrel, by default, can store in memory the location of 1 tree, 2 garbage cans and 5 nuts.
 
-**Note**: Squirrels can only see if a tree or garbage can is occupied while in vision. Addtionally, we can keep track of locations of nuts in memory that may have been picked up by another squirrel while not in vision.
+**Note**: Squirrels can only see if a tree or garbage can is occupied while in vision. Additionally, we can keep track of locations of nuts in memory that may have been picked up by another squirrel while not in vision.
 
 ## Goals
 Squirrels have the following goals/behaviours:
