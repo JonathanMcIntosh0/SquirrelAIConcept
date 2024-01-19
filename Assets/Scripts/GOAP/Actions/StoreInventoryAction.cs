@@ -16,8 +16,10 @@ namespace GOAP.Actions
             // GetTargets assures target.type == HomeTree
             if (target.type != TargetType.HomeTree) return null; // Safety check
             
+            // If distanceTravelled > 0 then not first action in plan so no point in checking if canClimb just yet
+            // since we will take some time to gather food. 
             // If inFOV then check if we can climb (not "isUsable" in case we are already on target)
-            if (target.state == TargetState.InFOV 
+            if (cur.distanceTravelled == 0 && target.state == TargetState.InFOV 
                 && !NavSystem.CanClimb((TreeController) target.objController)) return null;
 
             Controller.MoveStateTo(ref cur, target.location, GameModel.SquirrelHomeHeight);

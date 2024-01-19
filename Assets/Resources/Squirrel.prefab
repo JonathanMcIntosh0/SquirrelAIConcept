@@ -253,7 +253,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goals: []
   actions: []
-  maxIterations: 200
+  maxIterations: 100
 --- !u!114 &913315274395471652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,6 +426,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   priority: 10
   minExploreDistance: 15
+  wallAllowance: 1
 --- !u!114 &2158812625357842152
 MonoBehaviour:
   m_ObjectHideFlags: 0

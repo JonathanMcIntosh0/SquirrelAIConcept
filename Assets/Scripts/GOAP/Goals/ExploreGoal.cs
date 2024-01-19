@@ -5,7 +5,11 @@ namespace GOAP.Goals
     public class ExploreGoal : BaseGoal
     {
         [SerializeField] private float minExploreDistance = 15f;
-
+        
+        // How close we have to get to a wall for us to complete goal.
+        // Helps deal with issues where search gets stuck on walls.
+        [SerializeField] private float wallAllowance = 1f; 
+        
         public override bool PreCondition(WorldState cur)
         {
             return !cur.isPlayerNear;
@@ -13,6 +17,15 @@ namespace GOAP.Goals
 
         public override bool PostCondition(WorldState next)
         {
+            if (next.distanceTravelled > 0 &&
+                (next.location.x - GameModel.MinX <= wallAllowance ||
+                 next.location.y - GameModel.MinZ <= wallAllowance ||
+                 GameModel.MaxX - next.location.x <= wallAllowance ||
+                 GameModel.MaxZ - next.location.y <= wallAllowance))
+            {
+                // Debug.Log($"{gameObject.name}: Explore Goal: Close to wall!\n");
+                return true;
+            }
             return Vector2.Distance(next.location, Controller.curState.location) >= minExploreDistance;
         }
 
@@ -35,10 +48,18 @@ namespace GOAP.Goals
             // if dFromCur == 0 then return 0;
             // dTravelled >= dFromCur > 0 =>  0 < dFromCur/dTravelled <= 1
             // -cost = dFromCur - (1 - dFromCur/dTravelled)
-            
             // -cost = dFromCur * (dFromCur/dTravelled)
+            
             var distanceFromCur = Vector2.Distance(next.location, Controller.curState.location);
-            return cost + minExploreDistance - distanceFromCur;
+            // Just prioritize getting to goal (no need to minimize action cost)
+            return minExploreDistance - distanceFromCur;
+            
+            
+            // return next.distanceTravelled + 10*(minExploreDistance - distanceFromCur); 
+            // var distanceToGo = minExploreDistance - distanceFromCur;
+            // return distanceToGo * (next.distanceTravelled / distanceFromCur);
+            
+            // return cost + minExploreDistance - distanceFromCur;
             // return cost == 0 ? 0 : -distanceFromCur * distanceFromCur / cost;
             // return cost == 0 ? 0 : -(distanceFromCur - (1 - distanceFromCur / cost));
         }

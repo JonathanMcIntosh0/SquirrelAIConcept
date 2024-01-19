@@ -114,7 +114,7 @@ namespace GOAP.Agent
         [SerializeField] private List<BaseGoal> goals;
         [SerializeField] private List<BaseAction> actions;
 
-        [SerializeField] private int maxIterations = 200; 
+        [SerializeField] private int maxIterations = 100; 
         
         private Plan _curPlan = null;
         public bool HasPlan => _curPlan != null;
@@ -163,24 +163,27 @@ namespace GOAP.Agent
             // _curState.distanceTravelled = 0; // Reset local curState.distanceTravelled before attempting replan
             _curState.ResetForPlanning();
 
-            var planQuery =
-                from goal in goals
+            // Go through valid goals in descending order of priority (greater than curPlan) until we find a valid plan
+            var newPlan =
+                (from goal in goals
                 where goal.enabled && goal.PreCondition(_curState)
-                let plan = BuildPlan(goal)
-                where plan != null
-                select plan;
+                                   && (_curPlan == null || _curPlan.Goal.Priority < goal.Priority)
+                orderby goal.Priority descending
+                select BuildPlan(goal)).FirstOrDefault(plan => plan != null);
 
-            var newPlan = planQuery.Aggregate(_curPlan, 
-                (newPlan, nextPlan) =>
-                    newPlan == null
-                    || newPlan.Goal.Priority < nextPlan.Goal.Priority
-                    || newPlan.Goal == nextPlan.Goal && newPlan.Cost > nextPlan.Cost
-                        ? nextPlan
-                        : newPlan);
-
-            if (newPlan == _curPlan) return;
+            // NOTE: Removed this since it doesn't make much sense.
+            //       If curPlan != null and couldn't find valid plan with higher priority then just complete curPlan.
+            //       Just added complexity to try replan for "lower cost" with same goal.
+            // if (newPlan == null && _curPlan != null)
+            // {
+            //     var nextPlan = BuildPlan(_curPlan.Goal);
+            //     // TODO maybe _curPlan.Cost should be "current cost" since curPlan could be partially complete
+            //     if (nextPlan != null && nextPlan.Cost < _curPlan.Cost) newPlan = nextPlan;
+            // }
             
-            Debug.Log($"{gameObject.name}: Found new plan: \n{newPlan}");
+            if (newPlan == null) return; // Continue running curPlan
+
+            // Debug.Log($"{gameObject.name}: Found new plan: \n{newPlan}");
             
             _controller.curState.ResetForPlanning();
             // _controller.curState.hasReplanned = true; // Will cause curState.distanceTravelled to be reset on next update

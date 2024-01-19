@@ -29,7 +29,7 @@ namespace GOAP.Goals
 
         public override float GetCost(WorldState next, float cost)
         {
-            return -cost;
+            return minTravelDistance - next.distanceTravelled; // Just prioritize getting to goal as quick as possible
         }
     }
 }
