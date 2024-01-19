@@ -114,7 +114,7 @@ namespace GOAP.Agent
         [SerializeField] private List<BaseGoal> goals;
         [SerializeField] private List<BaseAction> actions;
 
-        [SerializeField] private int maxIterations = 50; 
+        [SerializeField] private int maxIterations = 200; 
         
         private Plan _curPlan = null;
         public bool HasPlan => _curPlan != null;
@@ -193,42 +193,70 @@ namespace GOAP.Agent
             if (goal.PostCondition(_curState)) return null;
 
             //TODO maybe make openList a minHeap
-            List<Node> openList = new List<Node>();
+            LinkedList<Node> openList = new LinkedList<Node>();
             ExpandNode(openList, new Node(goal, _curState), goal);
 
             int iterations = 0;
             while (openList.Count > 0 && iterations++ < maxIterations)
             {
-                var minNode = openList.Aggregate(
-                    (minCostNode, nextNode) => minCostNode.Cost > nextNode.Cost ? nextNode : minCostNode);
+                var minNode = openList.First.Value;
+                // var minNode = openList.Aggregate(
+                //     (minCostNode, nextNode) => minCostNode.Cost > nextNode.Cost ? nextNode : minCostNode);
 
-                if (goal.PostCondition(minNode.State)) 
+                if (goal.PostCondition(minNode.State))
+                {
+                    // Debug.Log($"{gameObject.name}: Found plan for {goal} - openList.Count = {openList.Count}, iter = {iterations}\n");
                     return new Plan(goal, minNode);
+                }
 
-                openList.Remove(minNode);
+                openList.RemoveFirst();
+                // openList.Remove(minNode);
                 ExpandNode(openList, minNode, goal);
             }
 
-            // Debug.Log($"{gameObject.name}: Could not find plan for {goal} - openList.Count = {openList.Count}, iter = {iterations}\n");
+            Debug.Log($"{gameObject.name}: Could not find plan for {goal} - openList.Count = {openList.Count}, iter = {iterations}\n");
             return null;
         }
         
-        private void ExpandNode(List<Node> openList, Node workingNode, BaseGoal goal)
+        private void ExpandNode(LinkedList<Node> openList, Node workingNode, BaseGoal goal)
         {
             IEnumerable<BaseAction> actionList;
             if (goal is WanderGoal || goal is ExploreGoal)
                 actionList = actions.Where(action => action is WanderAction);
             else
                 actionList = actions.Where(action => !(action is WanderAction));
+
+            var nodeQuerry = from action in actionList
+                where action.enabled && action.PreCondition(workingNode.State)
+                from target in action.GetTargets(workingNode.State)
+                where target.type != TargetType.Nut || !workingNode.HasUsedTarget(target)
+                let nextState = action.CalculateState(workingNode.State, target)
+                where nextState != null
+                select new Node(goal, nextState.Value, action, target, workingNode);
             
-            openList.AddRange(
-                from action in actionList 
-                where action.enabled && action.PreCondition(workingNode.State) 
-                from target in action.GetTargets(workingNode.State) 
-                where target.type != TargetType.Nut || !workingNode.HasUsedTarget(target) 
-                let nextState = action.CalculateState(workingNode.State, target) 
-                where nextState != null 
-                select new Node(goal, nextState.Value, action, target, workingNode));
+            foreach (var node in nodeQuerry)
+            {
+                if (openList.Count == 0 || node.Cost <= openList.First.Value.Cost)
+                {
+                    openList.AddFirst(node);
+                    continue;
+                }
+                
+                var cur = openList.First;
+                while (cur != openList.Last && cur.Value.Cost < node.Cost) 
+                    cur = cur.Next;
+                openList.AddAfter(cur, node);
+            }
+            
+            //
+            // openList.AddRange(
+            //     from action in actionList 
+            //     where action.enabled && action.PreCondition(workingNode.State) 
+            //     from target in action.GetTargets(workingNode.State) 
+            //     where target.type != TargetType.Nut || !workingNode.HasUsedTarget(target) 
+            //     let nextState = action.CalculateState(workingNode.State, target) 
+            //     where nextState != null 
+            //     select new Node(goal, nextState.Value, action, target, workingNode));
         }
     }
 }

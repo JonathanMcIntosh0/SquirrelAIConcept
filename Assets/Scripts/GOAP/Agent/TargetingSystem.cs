@@ -16,10 +16,11 @@ namespace GOAP.Agent
         public TreeController homeTreeController; // Gets set by GameGenerator
         private PlayerController _playerController;
 
-        [Header("Memory Sizes")]
+        [Header("Memory Settings")]
         [SerializeField] private int nutMemorySize = 5;
         [SerializeField] private int garbageCanMemorySize = 2;
         [SerializeField] private int treeMemorySize = 1;
+        [SerializeField] private float maxMemoryTimer = 15f; // Max time in seconds we can store a target in memory
         
         [Header("Targets")]
         //TODO Maybe change homeTreeTarget get so we do not return if (inFOV && !isUsable)
@@ -62,16 +63,19 @@ namespace GOAP.Agent
                 if (IsInFOV(target.location))
                 {
                     target.state = TargetState.InFOV;
+                    target.memoryTimer = 0f;
                     // skip collected nuts (don't skip trees or cans)
                     if (target.objController == null) continue; 
                     newTargetsInFOV.Add(target);
                 } 
                 else if (counts[(int) target.type] < maxMemSizes[(int) target.type] 
+                         && target.memoryTimer < maxMemoryTimer
                     // do not move target into memory from targetsInFOV if !usable
                          && !(target.state == TargetState.InFOV && !target.IsUsable())) 
                 {
                     counts[(int) target.type]++;
                     target.state = TargetState.InMemory;
+                    target.memoryTimer += Time.deltaTime;
                     newTargetsInMem.Add(target); //Add to end not front
                 } 
                 else 

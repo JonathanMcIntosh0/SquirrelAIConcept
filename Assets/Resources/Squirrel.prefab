@@ -253,7 +253,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goals: []
   actions: []
-  maxIterations: 50
+  maxIterations: 200
 --- !u!114 &913315274395471652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,6 +293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 0}
+  avoidancePriority: 0
   climbSpeed: 5
   offMeshDestination: {x: 0, y: 0}
   destination: {x: 0, y: 0, z: 0}
@@ -313,11 +314,13 @@ MonoBehaviour:
   nutMemorySize: 5
   garbageCanMemorySize: 2
   treeMemorySize: 1
+  maxMemoryTimer: 15
   homeTreeTarget:
     location: {x: 0, y: 0}
     type: 0
     objController: {fileID: 0}
     state: 0
+    memoryTimer: 0
   targetsInFOV: []
   targetsInMemory: []
 --- !u!114 &4526167552080997791

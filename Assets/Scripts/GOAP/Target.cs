@@ -30,6 +30,7 @@ namespace GOAP
         public TargetType type; // TODO maybe remove this and use is operator (might need an isHomeTree and isLocation bool)
         public MonoBehaviour objController;
         public TargetState state;
+        public float memoryTimer = 0f;
 
         public Target(Vector2 location, TargetType type, MonoBehaviour objController, TargetState state)
         {

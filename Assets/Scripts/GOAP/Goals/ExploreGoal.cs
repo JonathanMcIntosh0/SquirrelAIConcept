@@ -38,7 +38,8 @@ namespace GOAP.Goals
             
             // -cost = dFromCur * (dFromCur/dTravelled)
             var distanceFromCur = Vector2.Distance(next.location, Controller.curState.location);
-            return cost == 0 ? 0 : -distanceFromCur * distanceFromCur / cost;
+            return cost + minExploreDistance - distanceFromCur;
+            // return cost == 0 ? 0 : -distanceFromCur * distanceFromCur / cost;
             // return cost == 0 ? 0 : -(distanceFromCur - (1 - distanceFromCur / cost));
         }
     }
