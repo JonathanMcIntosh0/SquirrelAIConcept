@@ -17,12 +17,12 @@ This is a game concept with Squirrels using Goal Oriented Action Planning (GOAP)
 The world mainly consists of trees, garbage cans and nuts.
 - Each squirrel gets assigned a unique Home Tree (where they are spawned).
 - Each tree continuously spawns nuts in intervals until it reaches a maximum capacity.
-- Each garbage can is either empty (grey) or full (black) and flips between states after a delay.
+- Each garbage can is either empty (grey) or full (black) and flips between states after a delay. (Turns Red while squirrel is trapped)
 
 ## Actions
 Squirrels can do the following actions:
 - Pick up nut
-- Investigate garbage can: If can is full then add garbage to inventory. If can is empty then squirrel gets trapped for a while.
+- Investigate garbage can: If can is full then add garbage to inventory. If can is empty then squirrel gets trapped for a while (Red can).
 - Store inventory: If at home tree, it can empty its inventory.
 - Hide: Climb up tree and wait
 
